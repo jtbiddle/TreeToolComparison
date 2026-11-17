@@ -1,0 +1,1278 @@
+{
+ "status": "accepted",
+ "receipt": "Saved/Comparison/wind-benchmark-v1/packet.json",
+ "receiptSHA256": "02abb673c629d6ebc88ddb28867183cc6d81edc30d9313bacaec0b6a34df03c6",
+ "engineVersion": "5.8.4",
+ "gpu": "NVIDIA GeForce RTX 3090",
+ "resolution": [
+  1920,
+  1080
+ ],
+ "cvars": {
+  "r.VSync": 0,
+  "t.MaxFPS": 0,
+  "r.DynamicRes.OperationMode": 0,
+  "r.ScreenPercentage": 100,
+  "r.AntiAliasingMethod": 4,
+  "r.Streaming.PoolSize": 4000,
+  "r.Nanite.Visualize": "off",
+  "t.IdleWhenNotForeground": 0,
+  "sg.ViewDistanceQuality": 3,
+  "sg.AntiAliasingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.ShadingQuality": 3,
+  "r.Shadow.Virtual.Enable": 1,
+  "r.Shadow.Virtual.Cache": 1,
+  "DynamicWind.OverrideSpeed": 15,
+  "DynamicWind.OverrideAmplitude": 1,
+  "DynamicWind.PreferAsyncCompute": 0,
+  "DynamicWind.UseSine": 0,
+  "FoliageToolkit.SkinnedTick": 0
+ },
+ "measuredFrames": 21564,
+ "traversals": 48,
+ "timedTraversals": 36,
+ "secondsPerTraversal": 10,
+ "cameraHeightCm": 170,
+ "method": "Same saved PCG population and eye-height ten-second camera path. Native DynamicWind provider versus no provider/static rendering. Each traversal reloads its map, waits five simulation seconds, then plays the identical saved path; one warmup and three measured traversals per case.",
+ "aggregation": "Median of three run medians; displayed p95 is median of the three per-run95th-percentile samples.",
+ "metricDefinitions": {
+  "nanite": "Main-view NaniteVisBuffer culling/raster + NaniteBasePass depth/material work; Nanite shadow work is in shadows.",
+  "shadows": "ShadowDepths + ShadowProjection exclusive buckets, including Nanite shadow work.",
+  "lighting": "Lights + RenderDeferredLighting + ReflectionEnvironment + ScreenSpaceReflections + SSAO exclusive buckets; other lighting may live elsewhere.",
+  "dynamicWind": "DynamicWind GPU compute",
+  "cpuSkinningScene": "Exclusive RenderThread STAT_SkinningSceneExtension",
+  "graphicsOther": "All other exported Graphics GPU scope buckets; excludes the named groups.",
+  "graphicsScopeSum": "Sum of every exclusive exported Graphics GPU scope, narrower than whole-frame GPUTime."
+ },
+ "limitations": [
+  "Toolkit tree outputs retain masked leaves; these are wind diagnostics and remain incompatible with the opaque conversion goal.",
+  "Equal global wind inputs do not make the two plugins deform identically. Compare wind-on/off overhead within each output.",
+  "DynamicWind evaluates shared skeletons/directional poses on the GPU; reference bone count is not per-instance CPU simulation work.",
+  "GPU counters are exclusive Graphics queue Busy+Wait times, as exported by Unreal GPU CSV. They are narrower than whole-frame GPUTime and do not cover async queues.",
+  "CPU SkinningSceneExtension is a broad renderer update scope, not a pure bone solve. Exact provider CPU setup is measured separately in an unscored Insights diagnostic.",
+  "Native animation screen-size culling is retained. Distant instances may stop animating.",
+  "Standalone UnrealEditor -game at1920x1080 Epic TSR on RTX3090; no packaged-build claim."
+ ],
+ "cpuMethod": "Native Unreal Insights CPU timers exported for each APT camera region. Regions are bound chronologically to the twelve scheduled cases and their verified fixed-camera CSV passes.",
+ "cpuLimitations": [
+  "CPU work sums event durations across participating threads; it is not critical-path frame latency.",
+  "The diagnostic includes camera-boundary frames and screenshot renders. Counts use its observed game-frame events, not the separate scored run's599interior frames.",
+  "ProvideTransforms prepares DynamicWind GPU work; it does not solve every instance's bones on the CPU.",
+  "FSkinningSceneExtension::Tick includes broader renderer skinning setup. Nested timer totals must not be added together."
+ ],
+ "entries": [
+  {
+   "asset": "freshcan-tropical-1",
+   "tool": "leafcut",
+   "wind": "off",
+   "boneCount": 13,
+   "instanceCount": 576,
+   "componentClass": "InstancedSkinnedMeshComponent",
+   "opaqueConversionCompatible": true,
+   "scoredFrames": 1797,
+   "GPUTime": {
+    "medianMs": 10.6559,
+    "p95Ms": 11.1846,
+    "runMedianMinMs": 10.6377,
+    "runMedianMaxMs": 10.6724
+   },
+   "FrameTime": {
+    "medianMs": 12.0776,
+    "p95Ms": 13.3815,
+    "runMedianMinMs": 12.0373,
+    "runMedianMaxMs": 12.0783
+   },
+   "GameThreadTime": {
+    "medianMs": 2.5546,
+    "p95Ms": 3.8046,
+    "runMedianMinMs": 2.461,
+    "runMedianMaxMs": 2.5599
+   },
+   "RenderThreadTime": {
+    "medianMs": 12.1347,
+    "p95Ms": 13.6738,
+    "runMedianMinMs": 12.1196,
+    "runMedianMaxMs": 12.1587
+   },
+   "stages": {
+    "nanite": {
+     "medianMs": 1.2705,
+     "p95Ms": null,
+     "runMedianMinMs": 1.2684000000000002,
+     "runMedianMaxMs": 1.2715999999999998
+    },
+    "shadows": {
+     "medianMs": 4.0976,
+     "p95Ms": null,
+     "runMedianMinMs": 4.0883,
+     "runMedianMaxMs": 4.1198
+    },
+    "lighting": {
+     "medianMs": 0.6122000000000001,
+     "p95Ms": null,
+     "runMedianMinMs": 0.6113999999999999,
+     "runMedianMaxMs": 0.6134
+    },
+    "dynamicWind": {
+     "medianMs": null,
+     "p95Ms": null,
+     "runMedianMinMs": null,
+     "runMedianMaxMs": null
+    },
+    "cpuSkinningScene": {
+     "medianMs": 0.1225,
+     "p95Ms": null,
+     "runMedianMinMs": 0.1191,
+     "runMedianMaxMs": 0.1267
+    },
+    "graphicsOther": {
+     "medianMs": 4.6559,
+     "p95Ms": null,
+     "runMedianMinMs": 4.6555,
+     "runMedianMaxMs": 4.656599999999999
+    },
+    "graphicsScopeSum": {
+     "medianMs": 10.6513,
+     "p95Ms": null,
+     "runMedianMinMs": 10.632299999999999,
+     "runMedianMaxMs": 10.662000000000003
+    }
+   },
+   "cpuTimers": {
+    "FDynamicWindTransformProvider::ProvideTransforms": null,
+    "FSkinningSceneExtension::Tick": {
+     "callCount": 600,
+     "medianCallUs": 6.2,
+     "p95CallUs": 10.7,
+     "totalCpuWorkMs": 4.013799999999997,
+     "cpuWorkMsPerDiagnosticGameFrame": 0.006678535773710478,
+     "threadCount": 1
+    }
+   },
+   "frames": {
+    "t5": "captures/wind/freshcan-tropical-1_leafcut_off_t5.jpg",
+    "t7": "captures/wind/freshcan-tropical-1_leafcut_off_t7.jpg",
+    "size": [
+     1280,
+     720
+    ]
+   }
+  },
+  {
+   "asset": "freshcan-tropical-1",
+   "tool": "leafcut",
+   "wind": "on",
+   "boneCount": 13,
+   "instanceCount": 576,
+   "componentClass": "InstancedSkinnedMeshComponent",
+   "opaqueConversionCompatible": true,
+   "scoredFrames": 1797,
+   "GPUTime": {
+    "medianMs": 10.7115,
+    "p95Ms": 11.1997,
+    "runMedianMinMs": 10.7024,
+    "runMedianMaxMs": 10.7952
+   },
+   "FrameTime": {
+    "medianMs": 12.1446,
+    "p95Ms": 13.6969,
+    "runMedianMinMs": 12.0875,
+    "runMedianMaxMs": 12.2663
+   },
+   "GameThreadTime": {
+    "medianMs": 2.4999,
+    "p95Ms": 3.9727,
+    "runMedianMinMs": 2.4494,
+    "runMedianMaxMs": 2.8859
+   },
+   "RenderThreadTime": {
+    "medianMs": 12.2349,
+    "p95Ms": 13.8681,
+    "runMedianMinMs": 12.2063,
+    "runMedianMaxMs": 12.3068
+   },
+   "stages": {
+    "nanite": {
+     "medianMs": 1.3058,
+     "p95Ms": null,
+     "runMedianMinMs": 1.3024,
+     "runMedianMaxMs": 1.3077999999999999
+    },
+    "shadows": {
+     "medianMs": 4.1027000000000005,
+     "p95Ms": null,
+     "runMedianMinMs": 4.102399999999999,
+     "runMedianMaxMs": 4.1944
+    },
+    "lighting": {
+     "medianMs": 0.6134,
+     "p95Ms": null,
+     "runMedianMinMs": 0.6124,
+     "runMedianMaxMs": 0.6134
+    },
+    "dynamicWind": {
+     "medianMs": 0.0051,
+     "p95Ms": null,
+     "runMedianMinMs": 0.0051,
+     "runMedianMaxMs": 0.0052
+    },
+    "cpuSkinningScene": {
+     "medianMs": 0.1169,
+     "p95Ms": null,
+     "runMedianMinMs": 0.115,
+     "runMedianMaxMs": 0.1393
+    },
+    "graphicsOther": {
+     "medianMs": 4.6392,
+     "p95Ms": null,
+     "runMedianMinMs": 4.620399999999999,
+     "runMedianMaxMs": 4.6861
+    },
+    "graphicsScopeSum": {
+     "medianMs": 10.7225,
+     "p95Ms": null,
+     "runMedianMinMs": 10.698399999999998,
+     "runMedianMaxMs": 10.7764
+    }
+   },
+   "cpuTimers": {
+    "FDynamicWindTransformProvider::ProvideTransforms": {
+     "callCount": 607,
+     "medianCallUs": 0.6,
+     "p95CallUs": 1.1,
+     "totalCpuWorkMs": 0.4145000000000031,
+     "cpuWorkMsPerDiagnosticGameFrame": 0.0006896838602329503,
+     "threadCount": 30
+    },
+    "FSkinningSceneExtension::Tick": {
+     "callCount": 600,
+     "medianCallUs": 5.699999999999999,
+     "p95CallUs": 11.0,
+     "totalCpuWorkMs": 4.100899999999995,
+     "cpuWorkMsPerDiagnosticGameFrame": 0.006823460898502488,
+     "threadCount": 1
+    }
+   },
+   "frames": {
+    "t5": "captures/wind/freshcan-tropical-1_leafcut_on_t5.jpg",
+    "t7": "captures/wind/freshcan-tropical-1_leafcut_on_t7.jpg",
+    "size": [
+     1280,
+     720
+    ]
+   }
+  },
+  {
+   "asset": "freshcan-tropical-1",
+   "tool": "toolkit",
+   "wind": "off",
+   "boneCount": 70,
+   "instanceCount": 576,
+   "componentClass": "InstancedSkinnedMeshComponent",
+   "opaqueConversionCompatible": false,
+   "scoredFrames": 1797,
+   "GPUTime": {
+    "medianMs": 13.6334,
+    "p95Ms": 14.3756,
+    "runMedianMinMs": 13.6163,
+    "runMedianMaxMs": 13.6981
+   },
+   "FrameTime": {
+    "medianMs": 14.9994,
+    "p95Ms": 16.5742,
+    "runMedianMinMs": 14.9752,
+    "runMedianMaxMs": 15.0214
+   },
+   "GameThreadTime": {
+    "medianMs": 2.746,
+    "p95Ms": 4.1965,
+    "runMedianMinMs": 2.6191,
+    "runMedianMaxMs": 2.8748
+   },
+   "RenderThreadTime": {
+    "medianMs": 15.101,
+    "p95Ms": 16.9513,
+    "runMedianMinMs": 15.0377,
+    "runMedianMaxMs": 15.1411
+   },
+   "stages": {
+    "nanite": {
+     "medianMs": 1.8734000000000002,
+     "p95Ms": null,
+     "runMedianMinMs": 1.8698000000000001,
+     "runMedianMaxMs": 1.8764
+    },
+    "shadows": {
+     "medianMs": 6.545,
+     "p95Ms": null,
+     "runMedianMinMs": 6.5253,
+     "runMedianMaxMs": 6.5458
+    },
+    "lighting": {
+     "medianMs": 0.6063000000000001,
+     "p95Ms": null,
+     "runMedianMinMs": 0.6061000000000001,
+     "runMedianMaxMs": 0.6064
+    },
+    "dynamicWind": {
+     "medianMs": null,
+     "p95Ms": null,
+     "runMedianMinMs": null,
+     "runMedianMaxMs": null
+    },
+    "cpuSkinningScene": {
+     "medianMs": 0.1397,
+     "p95Ms": null,
+     "runMedianMinMs": 0.1321,
+     "runMedianMaxMs": 0.1439
+    },
+    "graphicsOther": {
+     "medianMs": 4.613700000000001,
+     "p95Ms": null,
+     "runMedianMinMs": 4.59,
+     "runMedianMaxMs": 4.6158
+    },
+    "graphicsScopeSum": {
+     "medianMs": 13.6221,
+     "p95Ms": null,
+     "runMedianMinMs": 13.611,
+     "runMedianMaxMs": 13.694399999999995
+    }
+   },
+   "cpuTimers": {
+    "FDynamicWindTransformProvider::ProvideTransforms": null,
+    "FSkinningSceneExtension::Tick": {
+     "callCount": 600,
+     "medianCallUs": 6.2,
+     "p95CallUs": 11.399999999999999,
+     "totalCpuWorkMs": 4.229699999999999,
+     "cpuWorkMsPerDiagnosticGameFrame": 0.007037770382695506,
+     "threadCount": 1
+    }
+   },
+   "frames": {
+    "t5": "captures/wind/freshcan-tropical-1_toolkit_off_t5.jpg",
+    "t7": "captures/wind/freshcan-tropical-1_toolkit_off_t7.jpg",
+    "size": [
+     1280,
+     720
+    ]
+   }
+  },
+  {
+   "asset": "freshcan-tropical-1",
+   "tool": "toolkit",
+   "wind": "on",
+   "boneCount": 70,
+   "instanceCount": 576,
+   "componentClass": "InstancedSkinnedMeshComponent",
+   "opaqueConversionCompatible": false,
+   "scoredFrames": 1797,
+   "GPUTime": {
+    "medianMs": 13.8151,
+    "p95Ms": 14.4654,
+    "runMedianMinMs": 13.7525,
+    "runMedianMaxMs": 13.8355
+   },
+   "FrameTime": {
+    "medianMs": 15.3154,
+    "p95Ms": 16.7183,
+    "runMedianMinMs": 15.0442,
+    "runMedianMaxMs": 15.3504
+   },
+   "GameThreadTime": {
+    "medianMs": 2.6659,
+    "p95Ms": 4.2184,
+    "runMedianMinMs": 2.5681,
+    "runMedianMaxMs": 3.0398
+   },
+   "RenderThreadTime": {
+    "medianMs": 15.4214,
+    "p95Ms": 17.0898,
+    "runMedianMinMs": 15.164,
+    "runMedianMaxMs": 15.5632
+   },
+   "stages": {
+    "nanite": {
+     "medianMs": 1.915,
+     "p95Ms": null,
+     "runMedianMinMs": 1.9148,
+     "runMedianMaxMs": 1.9167999999999998
+    },
+    "shadows": {
+     "medianMs": 6.661099999999999,
+     "p95Ms": null,
+     "runMedianMinMs": 6.6401,
+     "runMedianMaxMs": 6.6653
+    },
+    "lighting": {
+     "medianMs": 0.6064,
+     "p95Ms": null,
+     "runMedianMinMs": 0.6062000000000001,
+     "runMedianMaxMs": 0.6073
+    },
+    "dynamicWind": {
+     "medianMs": 0.0113,
+     "p95Ms": null,
+     "runMedianMinMs": 0.0113,
+     "runMedianMaxMs": 0.0113
+    },
+    "cpuSkinningScene": {
+     "medianMs": 0.1294,
+     "p95Ms": null,
+     "runMedianMinMs": 0.1278,
+     "runMedianMaxMs": 0.1513
+    },
+    "graphicsOther": {
+     "medianMs": 4.5893,
+     "p95Ms": null,
+     "runMedianMinMs": 4.571899999999999,
+     "runMedianMaxMs": 4.632499999999999
+    },
+    "graphicsScopeSum": {
+     "medianMs": 13.8102,
+     "p95Ms": null,
+     "runMedianMinMs": 13.7514,
+     "runMedianMaxMs": 13.836800000000002
+    }
+   },
+   "cpuTimers": {
+    "FDynamicWindTransformProvider::ProvideTransforms": {
+     "callCount": 607,
+     "medianCallUs": 0.7,
+     "p95CallUs": 1.3,
+     "totalCpuWorkMs": 0.4539000000000031,
+     "cpuWorkMsPerDiagnosticGameFrame": 0.0007552412645590734,
+     "threadCount": 30
+    },
+    "FSkinningSceneExtension::Tick": {
+     "callCount": 600,
+     "medianCallUs": 5.9,
+     "p95CallUs": 11.7,
+     "totalCpuWorkMs": 3.984200000000002,
+     "cpuWorkMsPerDiagnosticGameFrame": 0.006629284525790353,
+     "threadCount": 1
+    }
+   },
+   "frames": {
+    "t5": "captures/wind/freshcan-tropical-1_toolkit_on_t5.jpg",
+    "t7": "captures/wind/freshcan-tropical-1_toolkit_on_t7.jpg",
+    "size": [
+     1280,
+     720
+    ]
+   }
+  },
+  {
+   "asset": "freshcan-oak-1",
+   "tool": "leafcut",
+   "wind": "off",
+   "boneCount": 43,
+   "instanceCount": 576,
+   "componentClass": "InstancedSkinnedMeshComponent",
+   "opaqueConversionCompatible": true,
+   "scoredFrames": 1797,
+   "GPUTime": {
+    "medianMs": 12.388,
+    "p95Ms": 12.827,
+    "runMedianMinMs": 12.3511,
+    "runMedianMaxMs": 12.4498
+   },
+   "FrameTime": {
+    "medianMs": 13.8289,
+    "p95Ms": 14.9947,
+    "runMedianMinMs": 13.8273,
+    "runMedianMaxMs": 13.8562
+   },
+   "GameThreadTime": {
+    "medianMs": 2.6195,
+    "p95Ms": 3.8969,
+    "runMedianMinMs": 2.531,
+    "runMedianMaxMs": 2.6741
+   },
+   "RenderThreadTime": {
+    "medianMs": 13.8795,
+    "p95Ms": 15.2196,
+    "runMedianMinMs": 13.8524,
+    "runMedianMaxMs": 13.8809
+   },
+   "stages": {
+    "nanite": {
+     "medianMs": 1.3727,
+     "p95Ms": null,
+     "runMedianMinMs": 1.3679999999999999,
+     "runMedianMaxMs": 1.379
+    },
+    "shadows": {
+     "medianMs": 5.757300000000001,
+     "p95Ms": null,
+     "runMedianMinMs": 5.7318,
+     "runMedianMaxMs": 5.7725
+    },
+    "lighting": {
+     "medianMs": 0.6164000000000001,
+     "p95Ms": null,
+     "runMedianMinMs": 0.6153,
+     "runMedianMaxMs": 0.6184000000000001
+    },
+    "dynamicWind": {
+     "medianMs": null,
+     "p95Ms": null,
+     "runMedianMinMs": null,
+     "runMedianMaxMs": null
+    },
+    "cpuSkinningScene": {
+     "medianMs": 0.13,
+     "p95Ms": null,
+     "runMedianMinMs": 0.1255,
+     "runMedianMaxMs": 0.1324
+    },
+    "graphicsOther": {
+     "medianMs": 4.6313,
+     "p95Ms": null,
+     "runMedianMinMs": 4.6268,
+     "runMedianMaxMs": 4.6647
+    },
+    "graphicsScopeSum": {
+     "medianMs": 12.3791,
+     "p95Ms": null,
+     "runMedianMinMs": 12.346600000000002,
+     "runMedianMaxMs": 12.437999999999999
+    }
+   },
+   "cpuTimers": {
+    "FDynamicWindTransformProvider::ProvideTransforms": null,
+    "FSkinningSceneExtension::Tick": {
+     "callCount": 600,
+     "medianCallUs": 6.5,
+     "p95CallUs": 11.5,
+     "totalCpuWorkMs": 4.1723,
+     "cpuWorkMsPerDiagnosticGameFrame": 0.006942262895174709,
+     "threadCount": 1
+    }
+   },
+   "frames": {
+    "t5": "captures/wind/freshcan-oak-1_leafcut_off_t5.jpg",
+    "t7": "captures/wind/freshcan-oak-1_leafcut_off_t7.jpg",
+    "size": [
+     1280,
+     720
+    ]
+   }
+  },
+  {
+   "asset": "freshcan-oak-1",
+   "tool": "leafcut",
+   "wind": "on",
+   "boneCount": 43,
+   "instanceCount": 576,
+   "componentClass": "InstancedSkinnedMeshComponent",
+   "opaqueConversionCompatible": true,
+   "scoredFrames": 1797,
+   "GPUTime": {
+    "medianMs": 12.46,
+    "p95Ms": 12.887,
+    "runMedianMinMs": 12.3572,
+    "runMedianMaxMs": 12.5212
+   },
+   "FrameTime": {
+    "medianMs": 13.8863,
+    "p95Ms": 15.1577,
+    "runMedianMinMs": 13.7711,
+    "runMedianMaxMs": 13.9088
+   },
+   "GameThreadTime": {
+    "medianMs": 2.5111,
+    "p95Ms": 3.7041,
+    "runMedianMinMs": 2.4133,
+    "runMedianMaxMs": 2.8805
+   },
+   "RenderThreadTime": {
+    "medianMs": 13.9065,
+    "p95Ms": 15.801,
+    "runMedianMinMs": 13.7996,
+    "runMedianMaxMs": 13.9665
+   },
+   "stages": {
+    "nanite": {
+     "medianMs": 1.3980000000000001,
+     "p95Ms": null,
+     "runMedianMinMs": 1.3916,
+     "runMedianMaxMs": 1.4133
+    },
+    "shadows": {
+     "medianMs": 5.7682,
+     "p95Ms": null,
+     "runMedianMinMs": 5.701499999999999,
+     "runMedianMaxMs": 5.8269
+    },
+    "lighting": {
+     "medianMs": 0.6165,
+     "p95Ms": null,
+     "runMedianMinMs": 0.6163000000000001,
+     "runMedianMaxMs": 0.6184000000000001
+    },
+    "dynamicWind": {
+     "medianMs": 0.0102,
+     "p95Ms": null,
+     "runMedianMinMs": 0.0102,
+     "runMedianMaxMs": 0.0102
+    },
+    "cpuSkinningScene": {
+     "medianMs": 0.1203,
+     "p95Ms": null,
+     "runMedianMinMs": 0.1142,
+     "runMedianMaxMs": 0.1405
+    },
+    "graphicsOther": {
+     "medianMs": 4.6256,
+     "p95Ms": null,
+     "runMedianMinMs": 4.5985,
+     "runMedianMaxMs": 4.6319
+    },
+    "graphicsScopeSum": {
+     "medianMs": 12.4649,
+     "p95Ms": null,
+     "runMedianMinMs": 12.357700000000001,
+     "runMedianMaxMs": 12.526100000000003
+    }
+   },
+   "cpuTimers": {
+    "FDynamicWindTransformProvider::ProvideTransforms": {
+     "callCount": 607,
+     "medianCallUs": 0.7,
+     "p95CallUs": 1.3,
+     "totalCpuWorkMs": 0.4555000000000034,
+     "cpuWorkMsPerDiagnosticGameFrame": 0.0007579034941763784,
+     "threadCount": 31
+    },
+    "FSkinningSceneExtension::Tick": {
+     "callCount": 600,
+     "medianCallUs": 6.5,
+     "p95CallUs": 12.3,
+     "totalCpuWorkMs": 4.267499999999998,
+     "cpuWorkMsPerDiagnosticGameFrame": 0.007100665557404323,
+     "threadCount": 1
+    }
+   },
+   "frames": {
+    "t5": "captures/wind/freshcan-oak-1_leafcut_on_t5.jpg",
+    "t7": "captures/wind/freshcan-oak-1_leafcut_on_t7.jpg",
+    "size": [
+     1280,
+     720
+    ]
+   }
+  },
+  {
+   "asset": "freshcan-oak-1",
+   "tool": "toolkit",
+   "wind": "off",
+   "boneCount": 258,
+   "instanceCount": 576,
+   "componentClass": "InstancedSkinnedMeshComponent",
+   "opaqueConversionCompatible": false,
+   "scoredFrames": 1797,
+   "GPUTime": {
+    "medianMs": 37.9561,
+    "p95Ms": 39.5985,
+    "runMedianMinMs": 37.8709,
+    "runMedianMaxMs": 37.9918
+   },
+   "FrameTime": {
+    "medianMs": 39.4023,
+    "p95Ms": 41.6951,
+    "runMedianMinMs": 39.3558,
+    "runMedianMaxMs": 39.5289
+   },
+   "GameThreadTime": {
+    "medianMs": 2.7444,
+    "p95Ms": 3.8729,
+    "runMedianMinMs": 2.5904,
+    "runMedianMaxMs": 2.7679
+   },
+   "RenderThreadTime": {
+    "medianMs": 39.4576,
+    "p95Ms": 41.8288,
+    "runMedianMinMs": 39.454,
+    "runMedianMaxMs": 39.6492
+   },
+   "stages": {
+    "nanite": {
+     "medianMs": 3.5362,
+     "p95Ms": null,
+     "runMedianMinMs": 3.5289,
+     "runMedianMaxMs": 3.5381
+    },
+    "shadows": {
+     "medianMs": 28.970200000000002,
+     "p95Ms": null,
+     "runMedianMinMs": 28.900799999999997,
+     "runMedianMaxMs": 29.005
+    },
+    "lighting": {
+     "medianMs": 0.6368,
+     "p95Ms": null,
+     "runMedianMinMs": 0.6359999999999999,
+     "runMedianMaxMs": 0.6369
+    },
+    "dynamicWind": {
+     "medianMs": null,
+     "p95Ms": null,
+     "runMedianMinMs": null,
+     "runMedianMaxMs": null
+    },
+    "cpuSkinningScene": {
+     "medianMs": 0.1409,
+     "p95Ms": null,
+     "runMedianMinMs": 0.1311,
+     "runMedianMaxMs": 0.1421
+    },
+    "graphicsOther": {
+     "medianMs": 4.8225,
+     "p95Ms": null,
+     "runMedianMinMs": 4.814000000000001,
+     "runMedianMaxMs": 4.8271
+    },
+    "graphicsScopeSum": {
+     "medianMs": 37.979,
+     "p95Ms": null,
+     "runMedianMinMs": 37.88209999999999,
+     "runMedianMaxMs": 38.015299999999996
+    }
+   },
+   "cpuTimers": {
+    "FDynamicWindTransformProvider::ProvideTransforms": null,
+    "FSkinningSceneExtension::Tick": {
+     "callCount": 600,
+     "medianCallUs": 9.2,
+     "p95CallUs": 15.400000000000002,
+     "totalCpuWorkMs": 5.934400000000005,
+     "cpuWorkMsPerDiagnosticGameFrame": 0.009874209650582371,
+     "threadCount": 1
+    }
+   },
+   "frames": {
+    "t5": "captures/wind/freshcan-oak-1_toolkit_off_t5.jpg",
+    "t7": "captures/wind/freshcan-oak-1_toolkit_off_t7.jpg",
+    "size": [
+     1280,
+     720
+    ]
+   }
+  },
+  {
+   "asset": "freshcan-oak-1",
+   "tool": "toolkit",
+   "wind": "on",
+   "boneCount": 258,
+   "instanceCount": 576,
+   "componentClass": "InstancedSkinnedMeshComponent",
+   "opaqueConversionCompatible": false,
+   "scoredFrames": 1797,
+   "GPUTime": {
+    "medianMs": 38.6714,
+    "p95Ms": 40.4501,
+    "runMedianMinMs": 38.5681,
+    "runMedianMaxMs": 38.7207
+   },
+   "FrameTime": {
+    "medianMs": 40.1178,
+    "p95Ms": 42.4492,
+    "runMedianMinMs": 40.0178,
+    "runMedianMaxMs": 40.2181
+   },
+   "GameThreadTime": {
+    "medianMs": 2.5393,
+    "p95Ms": 3.6664,
+    "runMedianMinMs": 2.5264,
+    "runMedianMaxMs": 2.5425
+   },
+   "RenderThreadTime": {
+    "medianMs": 40.2919,
+    "p95Ms": 42.7092,
+    "runMedianMinMs": 40.146,
+    "runMedianMaxMs": 40.4552
+   },
+   "stages": {
+    "nanite": {
+     "medianMs": 3.5602,
+     "p95Ms": null,
+     "runMedianMinMs": 3.5434,
+     "runMedianMaxMs": 3.5763
+    },
+    "shadows": {
+     "medianMs": 29.666500000000003,
+     "p95Ms": null,
+     "runMedianMinMs": 29.5724,
+     "runMedianMaxMs": 29.6781
+    },
+    "lighting": {
+     "medianMs": 0.639,
+     "p95Ms": null,
+     "runMedianMinMs": 0.6369,
+     "runMedianMaxMs": 0.639
+    },
+    "dynamicWind": {
+     "medianMs": 0.0256,
+     "p95Ms": null,
+     "runMedianMinMs": 0.0256,
+     "runMedianMaxMs": 0.0256
+    },
+    "cpuSkinningScene": {
+     "medianMs": 0.1254,
+     "p95Ms": null,
+     "runMedianMinMs": 0.1239,
+     "runMedianMaxMs": 0.1258
+    },
+    "graphicsOther": {
+     "medianMs": 4.788999999999999,
+     "p95Ms": null,
+     "runMedianMinMs": 4.7857,
+     "runMedianMaxMs": 4.8152
+    },
+    "graphicsScopeSum": {
+     "medianMs": 38.6665,
+     "p95Ms": null,
+     "runMedianMinMs": 38.55989999999999,
+     "runMedianMaxMs": 38.72539999999999
+    }
+   },
+   "cpuTimers": {
+    "FDynamicWindTransformProvider::ProvideTransforms": {
+     "callCount": 607,
+     "medianCallUs": 1.0,
+     "p95CallUs": 1.5999999999999999,
+     "totalCpuWorkMs": 0.6212000000000014,
+     "cpuWorkMsPerDiagnosticGameFrame": 0.0010336106489184716,
+     "threadCount": 30
+    },
+    "FSkinningSceneExtension::Tick": {
+     "callCount": 600,
+     "medianCallUs": 8.7,
+     "p95CallUs": 16.3,
+     "totalCpuWorkMs": 5.708700000000008,
+     "cpuWorkMsPerDiagnosticGameFrame": 0.009498668885191361,
+     "threadCount": 1
+    }
+   },
+   "frames": {
+    "t5": "captures/wind/freshcan-oak-1_toolkit_on_t5.jpg",
+    "t7": "captures/wind/freshcan-oak-1_toolkit_on_t7.jpg",
+    "size": [
+     1280,
+     720
+    ]
+   }
+  },
+  {
+   "asset": "meshingun-maple-spring",
+   "tool": "leafcut",
+   "wind": "off",
+   "boneCount": 222,
+   "instanceCount": 576,
+   "componentClass": "InstancedSkinnedMeshComponent",
+   "opaqueConversionCompatible": true,
+   "scoredFrames": 1797,
+   "GPUTime": {
+    "medianMs": 12.1622,
+    "p95Ms": 12.6836,
+    "runMedianMinMs": 12.1488,
+    "runMedianMaxMs": 12.1769
+   },
+   "FrameTime": {
+    "medianMs": 13.5321,
+    "p95Ms": 14.7497,
+    "runMedianMinMs": 13.4604,
+    "runMedianMaxMs": 13.5341
+   },
+   "GameThreadTime": {
+    "medianMs": 2.6426,
+    "p95Ms": 3.7532,
+    "runMedianMinMs": 2.6002,
+    "runMedianMaxMs": 2.6804
+   },
+   "RenderThreadTime": {
+    "medianMs": 13.5896,
+    "p95Ms": 15.1337,
+    "runMedianMinMs": 13.5106,
+    "runMedianMaxMs": 13.615
+   },
+   "stages": {
+    "nanite": {
+     "medianMs": 1.7666,
+     "p95Ms": null,
+     "runMedianMinMs": 1.7594,
+     "runMedianMaxMs": 1.7717
+    },
+    "shadows": {
+     "medianMs": 5.1207,
+     "p95Ms": null,
+     "runMedianMinMs": 5.105,
+     "runMedianMaxMs": 5.122999999999999
+    },
+    "lighting": {
+     "medianMs": 0.6256999999999999,
+     "p95Ms": null,
+     "runMedianMinMs": 0.6248,
+     "runMedianMaxMs": 0.6256999999999999
+    },
+    "dynamicWind": {
+     "medianMs": null,
+     "p95Ms": null,
+     "runMedianMinMs": null,
+     "runMedianMaxMs": null
+    },
+    "cpuSkinningScene": {
+     "medianMs": 0.133,
+     "p95Ms": null,
+     "runMedianMinMs": 0.1298,
+     "runMedianMaxMs": 0.1347
+    },
+    "graphicsOther": {
+     "medianMs": 4.627800000000001,
+     "p95Ms": null,
+     "runMedianMinMs": 4.6275,
+     "runMedianMaxMs": 4.644100000000001
+    },
+    "graphicsScopeSum": {
+     "medianMs": 12.1466,
+     "p95Ms": null,
+     "runMedianMinMs": 12.1246,
+     "runMedianMaxMs": 12.166099999999997
+    }
+   },
+   "cpuTimers": {
+    "FDynamicWindTransformProvider::ProvideTransforms": null,
+    "FSkinningSceneExtension::Tick": {
+     "callCount": 600,
+     "medianCallUs": 6.3999999999999995,
+     "p95CallUs": 11.1,
+     "totalCpuWorkMs": 4.0973000000000015,
+     "cpuWorkMsPerDiagnosticGameFrame": 0.006817470881863563,
+     "threadCount": 1
+    }
+   },
+   "frames": {
+    "t5": "captures/wind/meshingun-maple-spring_leafcut_off_t5.jpg",
+    "t7": "captures/wind/meshingun-maple-spring_leafcut_off_t7.jpg",
+    "size": [
+     1280,
+     720
+    ]
+   }
+  },
+  {
+   "asset": "meshingun-maple-spring",
+   "tool": "leafcut",
+   "wind": "on",
+   "boneCount": 222,
+   "instanceCount": 576,
+   "componentClass": "InstancedSkinnedMeshComponent",
+   "opaqueConversionCompatible": true,
+   "scoredFrames": 1797,
+   "GPUTime": {
+    "medianMs": 12.2973,
+    "p95Ms": 12.6726,
+    "runMedianMinMs": 12.2481,
+    "runMedianMaxMs": 12.3036
+   },
+   "FrameTime": {
+    "medianMs": 13.6994,
+    "p95Ms": 14.7168,
+    "runMedianMinMs": 13.6351,
+    "runMedianMaxMs": 13.7116
+   },
+   "GameThreadTime": {
+    "medianMs": 2.4533,
+    "p95Ms": 3.6906,
+    "runMedianMinMs": 2.2466,
+    "runMedianMaxMs": 2.5255
+   },
+   "RenderThreadTime": {
+    "medianMs": 13.7309,
+    "p95Ms": 15.1865,
+    "runMedianMinMs": 13.6785,
+    "runMedianMaxMs": 13.757
+   },
+   "stages": {
+    "nanite": {
+     "medianMs": 1.8404,
+     "p95Ms": null,
+     "runMedianMinMs": 1.8398999999999999,
+     "runMedianMaxMs": 1.8411
+    },
+    "shadows": {
+     "medianMs": 5.1690000000000005,
+     "p95Ms": null,
+     "runMedianMinMs": 5.1486,
+     "runMedianMaxMs": 5.2057
+    },
+    "lighting": {
+     "medianMs": 0.6256999999999999,
+     "p95Ms": null,
+     "runMedianMinMs": 0.6255999999999999,
+     "runMedianMaxMs": 0.6257999999999999
+    },
+    "dynamicWind": {
+     "medianMs": 0.0133,
+     "p95Ms": null,
+     "runMedianMinMs": 0.0133,
+     "runMedianMaxMs": 0.0133
+    },
+    "cpuSkinningScene": {
+     "medianMs": 0.1185,
+     "p95Ms": null,
+     "runMedianMinMs": 0.1087,
+     "runMedianMaxMs": 0.1237
+    },
+    "graphicsOther": {
+     "medianMs": 4.6066,
+     "p95Ms": null,
+     "runMedianMinMs": 4.591999999999999,
+     "runMedianMaxMs": 4.6084000000000005
+    },
+    "graphicsScopeSum": {
+     "medianMs": 12.2742,
+     "p95Ms": null,
+     "runMedianMinMs": 12.231099999999998,
+     "runMedianMaxMs": 12.286899999999996
+    }
+   },
+   "cpuTimers": {
+    "FDynamicWindTransformProvider::ProvideTransforms": {
+     "callCount": 607,
+     "medianCallUs": 0.7999999999999999,
+     "p95CallUs": 1.4,
+     "totalCpuWorkMs": 0.5483000000000021,
+     "cpuWorkMsPerDiagnosticGameFrame": 0.0009123128119800368,
+     "threadCount": 30
+    },
+    "FSkinningSceneExtension::Tick": {
+     "callCount": 600,
+     "medianCallUs": 6.6000000000000005,
+     "p95CallUs": 12.3,
+     "totalCpuWorkMs": 4.411500000000001,
+     "cpuWorkMsPerDiagnosticGameFrame": 0.007340266222961732,
+     "threadCount": 1
+    }
+   },
+   "frames": {
+    "t5": "captures/wind/meshingun-maple-spring_leafcut_on_t5.jpg",
+    "t7": "captures/wind/meshingun-maple-spring_leafcut_on_t7.jpg",
+    "size": [
+     1280,
+     720
+    ]
+   }
+  },
+  {
+   "asset": "meshingun-maple-spring",
+   "tool": "toolkit",
+   "wind": "off",
+   "boneCount": 826,
+   "instanceCount": 576,
+   "componentClass": "InstancedSkinnedMeshComponent",
+   "opaqueConversionCompatible": false,
+   "scoredFrames": 1797,
+   "GPUTime": {
+    "medianMs": 18.7313,
+    "p95Ms": 19.3825,
+    "runMedianMinMs": 18.7137,
+    "runMedianMaxMs": 18.7475
+   },
+   "FrameTime": {
+    "medianMs": 19.9849,
+    "p95Ms": 21.3236,
+    "runMedianMinMs": 19.9798,
+    "runMedianMaxMs": 20.0036
+   },
+   "GameThreadTime": {
+    "medianMs": 2.5862,
+    "p95Ms": 3.8662,
+    "runMedianMinMs": 2.5178,
+    "runMedianMaxMs": 2.5872
+   },
+   "RenderThreadTime": {
+    "medianMs": 20.1235,
+    "p95Ms": 21.5201,
+    "runMedianMinMs": 20.0643,
+    "runMedianMaxMs": 20.1337
+   },
+   "stages": {
+    "nanite": {
+     "medianMs": 2.5305,
+     "p95Ms": null,
+     "runMedianMinMs": 2.5242,
+     "runMedianMaxMs": 2.5374
+    },
+    "shadows": {
+     "medianMs": 10.8395,
+     "p95Ms": null,
+     "runMedianMinMs": 10.8066,
+     "runMedianMaxMs": 10.8737
+    },
+    "lighting": {
+     "medianMs": 0.6227,
+     "p95Ms": null,
+     "runMedianMinMs": 0.6216999999999999,
+     "runMedianMaxMs": 0.6227
+    },
+    "dynamicWind": {
+     "medianMs": null,
+     "p95Ms": null,
+     "runMedianMinMs": null,
+     "runMedianMaxMs": null
+    },
+    "cpuSkinningScene": {
+     "medianMs": 0.1318,
+     "p95Ms": null,
+     "runMedianMinMs": 0.1247,
+     "runMedianMaxMs": 0.1331
+    },
+    "graphicsOther": {
+     "medianMs": 4.6895999999999995,
+     "p95Ms": null,
+     "runMedianMinMs": 4.6828,
+     "runMedianMaxMs": 4.710899999999999
+    },
+    "graphicsScopeSum": {
+     "medianMs": 18.717699999999997,
+     "p95Ms": null,
+     "runMedianMinMs": 18.6932,
+     "runMedianMaxMs": 18.730100000000004
+    }
+   },
+   "cpuTimers": {
+    "FDynamicWindTransformProvider::ProvideTransforms": null,
+    "FSkinningSceneExtension::Tick": {
+     "callCount": 600,
+     "medianCallUs": 6.9,
+     "p95CallUs": 11.9,
+     "totalCpuWorkMs": 4.464199999999997,
+     "cpuWorkMsPerDiagnosticGameFrame": 0.007427953410981692,
+     "threadCount": 1
+    }
+   },
+   "frames": {
+    "t5": "captures/wind/meshingun-maple-spring_toolkit_off_t5.jpg",
+    "t7": "captures/wind/meshingun-maple-spring_toolkit_off_t7.jpg",
+    "size": [
+     1280,
+     720
+    ]
+   }
+  },
+  {
+   "asset": "meshingun-maple-spring",
+   "tool": "toolkit",
+   "wind": "on",
+   "boneCount": 826,
+   "instanceCount": 576,
+   "componentClass": "InstancedSkinnedMeshComponent",
+   "opaqueConversionCompatible": false,
+   "scoredFrames": 1797,
+   "GPUTime": {
+    "medianMs": 19.2647,
+    "p95Ms": 20.0038,
+    "runMedianMinMs": 19.2606,
+    "runMedianMaxMs": 19.2732
+   },
+   "FrameTime": {
+    "medianMs": 20.595,
+    "p95Ms": 22.0566,
+    "runMedianMinMs": 20.5769,
+    "runMedianMaxMs": 20.5993
+   },
+   "GameThreadTime": {
+    "medianMs": 2.4853,
+    "p95Ms": 3.8041,
+    "runMedianMinMs": 2.4365,
+    "runMedianMaxMs": 2.5888
+   },
+   "RenderThreadTime": {
+    "medianMs": 20.7376,
+    "p95Ms": 22.3942,
+    "runMedianMinMs": 20.6862,
+    "runMedianMaxMs": 20.7481
+   },
+   "stages": {
+    "nanite": {
+     "medianMs": 2.534,
+     "p95Ms": null,
+     "runMedianMinMs": 2.5295,
+     "runMedianMaxMs": 2.5399000000000003
+    },
+    "shadows": {
+     "medianMs": 11.381900000000002,
+     "p95Ms": null,
+     "runMedianMinMs": 11.326600000000001,
+     "runMedianMaxMs": 11.4268
+    },
+    "lighting": {
+     "medianMs": 0.6215999999999999,
+     "p95Ms": null,
+     "runMedianMinMs": 0.6206,
+     "runMedianMaxMs": 0.6215999999999999
+    },
+    "dynamicWind": {
+     "medianMs": 0.0205,
+     "p95Ms": null,
+     "runMedianMinMs": 0.0204,
+     "runMedianMaxMs": 0.0205
+    },
+    "cpuSkinningScene": {
+     "medianMs": 0.1197,
+     "p95Ms": null,
+     "runMedianMinMs": 0.1196,
+     "runMedianMaxMs": 0.1297
+    },
+    "graphicsOther": {
+     "medianMs": 4.6681,
+     "p95Ms": null,
+     "runMedianMinMs": 4.664899999999999,
+     "runMedianMaxMs": 4.678899999999999
+    },
+    "graphicsScopeSum": {
+     "medianMs": 19.262400000000003,
+     "p95Ms": null,
+     "runMedianMinMs": 19.236400000000003,
+     "runMedianMaxMs": 19.265800000000002
+    }
+   },
+   "cpuTimers": {
+    "FDynamicWindTransformProvider::ProvideTransforms": {
+     "callCount": 607,
+     "medianCallUs": 1.1,
+     "p95CallUs": 2.0,
+     "totalCpuWorkMs": 0.7486000000000004,
+     "cpuWorkMsPerDiagnosticGameFrame": 0.00124559068219634,
+     "threadCount": 30
+    },
+    "FSkinningSceneExtension::Tick": {
+     "callCount": 600,
+     "medianCallUs": 6.7,
+     "p95CallUs": 12.3,
+     "totalCpuWorkMs": 4.493500000000001,
+     "cpuWorkMsPerDiagnosticGameFrame": 0.007476705490848588,
+     "threadCount": 1
+    }
+   },
+   "frames": {
+    "t5": "captures/wind/meshingun-maple-spring_toolkit_on_t5.jpg",
+    "t7": "captures/wind/meshingun-maple-spring_toolkit_on_t7.jpg",
+    "size": [
+     1280,
+     720
+    ]
+   }
+  }
+ ]
+}

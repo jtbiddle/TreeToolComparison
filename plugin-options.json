@@ -1,0 +1,1061 @@
+{
+  "generated": "2026-11-16",
+  "note": "Inventory of user-adjustable options read from each plugin's shipped source. Cites are file:line relative to each plugin root. 'unverified' marks points the code did not settle.",
+  "plugins": {
+    "leafcut": {
+      "name": "LeafCut",
+      "version": "1.0.0",
+      "root": "C:/Program Files/Epic Games/UE_5.8/Engine/Plugins/Marketplace/LeafCutNa27c760eb0b0V2",
+      "entryPoints": [
+        {
+          "label": "Open in LeafCut",
+          "kind": "content-browser-context-menu",
+          "where": "Static or skeletal meshes, multi-select. Source/LeafCutEditor/Private/LeafCutEditorModule.cpp:428-458"
+        },
+        {
+          "label": "LeafCut (dialog window)",
+          "kind": "modeless-dialog",
+          "where": "Reopening adds meshes to the open dialog. Source/LeafCutEditor/Private/SLeafCutDialog.cpp:735-766"
+        },
+        {
+          "label": "Drop static or skeletal meshes here.",
+          "kind": "drag-and-drop",
+          "where": "Dialog output list. SLeafCutDialog.cpp:635-651,684"
+        },
+        {
+          "label": "LeafCut::ConvertMeshes",
+          "kind": "cpp-api",
+          "where": "Exported C++ only, no UFUNCTION. Source/LeafCutEditor/Public/LeafCutEditor.h:12-15"
+        }
+      ],
+      "workflow": {
+        "model": "one-shot dialog",
+        "storesSettings": "Last-used dialog choices only, per user (EditorPerProjectUserSettings), saved on Convert; nothing stored on assets (LeafCutEditorSettings.h:92-99; SLeafCutDialog.cpp:974-983)",
+        "rerunnable": "Reopen dialog and convert again; same output name replaces the existing asset (SLeafCutDialog.cpp:877-879)",
+        "preview": "None; only per-row validation errors/warnings before Convert (SLeafCutDialog.cpp:808-949)",
+        "batch": "Yes: many meshes, one shared settings set, editable output name per row (SLeafCutDialog.cpp:768-783; LeafCutEditorModule.cpp:303-330)",
+        "inPlace": "Optional for opaque output by naming the output like the source; confirmation says it can't be undone. Not allowed for assemblies (SLeafCutDialog.cpp:860-866,960-971)",
+        "notes": "Mask is baked automatically from the material with MaterialBaking at the material's clip value (LeafCutOpacityMask.cpp:324-329,407); no mask texture/UV channel choice. No per-mesh or per-slot settings. Assembly falls back to opaque mesh when not worth it (LeafCutEditorModule.cpp:283-291). Solver tuning (FTuning, ~70 constants) is internal (LeafCutTuning.h:9-89)."
+      },
+      "outputs": [
+        "Opaque static or skeletal mesh (keeps source type), Nanite optional (SLeafCutDialog.cpp:803-806)",
+        "Nanite Assembly: static mesh or skeletal mesh with branch bones (LeafCutAssembly.h:19-47)",
+        "Shared assembly part meshes in <folder>/Assemblies (LeafCutPartStore.cpp:140-143)",
+        "Opaque MICs <Material>_Opaque, reused if present (LeafCutAssets.cpp:309-337)",
+        "Dynamic Wind skeletal data on skeletal assemblies if the engine Dynamic Wind plugin is enabled (LeafCutDynamicWind.cpp:242-244)",
+        "No runtime module/component (LeafCut.uplugin:21-61)"
+      ],
+      "scripting": [
+        "No BlueprintCallable/UFUNCTION or Python-visible API found",
+        "C++: LeafCut::ConvertMeshes (LeafCutEditor.h:12-15), LeafCut::BuildAssembly (LeafCutAssembly.h:142-156)"
+      ],
+      "panels": [
+        {
+          "title": "Opaque Cut",
+          "settings": [
+            {
+              "name": "bConvertToOpaque",
+              "displayName": "Opaque Cut (section checkbox)",
+              "type": "bool",
+              "default": true,
+              "range": "Forced on for opaque-mesh output; can be off only for Assembly",
+              "tooltip": "Cut the opacity mask into opaque geometry",
+              "advanced": false,
+              "cite": "LeafCutEditorSettings.h:48; SLeafCutDialog.cpp:79-82,450-457"
+            },
+            {
+              "name": "TexelTolerance",
+              "displayName": "Texel Tolerance",
+              "type": "float (texels)",
+              "default": 1.0,
+              "range": "0.1-10 (slider 0.5-4, step 0.1)",
+              "tooltip": "How far the cut outline may stray from the opaque pixels. Lower stays closer and makes more triangles.",
+              "advanced": false,
+              "cite": "LeafCutEditorSettings.h:51; SLeafCutDialog.cpp:458-463"
+            },
+            {
+              "name": "bCreateMaterialInstances",
+              "displayName": "Materials: Create opaque instances of the masked materials",
+              "type": "bool",
+              "default": true,
+              "range": null,
+              "tooltip": "Give the output opaque instances of its masked materials",
+              "advanced": false,
+              "cite": "LeafCutEditorSettings.h:54; SLeafCutDialog.cpp:464-480"
+            }
+          ]
+        },
+        {
+          "title": "Assembly",
+          "settings": [
+            {
+              "name": "OutputKind",
+              "displayName": "Assembly (section checkbox)",
+              "type": "enum OpaqueMesh|Assembly",
+              "default": "OpaqueMesh",
+              "range": null,
+              "tooltip": "Build a Nanite Assembly that shares the twigs that repeat as parts",
+              "advanced": false,
+              "cite": "LeafCutEditorSettings.h:39; SLeafCutDialog.cpp:484-495"
+            },
+            {
+              "name": "AssemblyType",
+              "displayName": "Type",
+              "type": "enum Skeletal|Static",
+              "default": "Skeletal",
+              "range": null,
+              "tooltip": "Output assembly type. Skeletal: bones along its branches for Dynamic Wind",
+              "advanced": false,
+              "cite": "LeafCutEditorSettings.h:42; SLeafCutDialog.cpp:496-514"
+            },
+            {
+              "name": "Quality",
+              "displayName": "Part Precision",
+              "type": "enum High|Medium|Low",
+              "default": "High",
+              "range": "High 2%, Medium 10%, Low 90% of mesh size",
+              "tooltip": "How closely a shared part must match each twig it stands in for",
+              "advanced": false,
+              "cite": "LeafCutEditorSettings.h:45,82; SLeafCutDialog.cpp:515-537"
+            },
+            {
+              "name": "BoneCap",
+              "displayName": "Bone Cap",
+              "type": "int",
+              "default": 1024,
+              "range": "1-65535 (slider 1-4096); skeletal only",
+              "tooltip": "Maximum bones for a skeletal assembly. Solver might use fewer.",
+              "advanced": false,
+              "cite": "LeafCutEditorSettings.h:66; SLeafCutDialog.cpp:538-542"
+            },
+            {
+              "name": "Stiffness",
+              "displayName": "Stiffness",
+              "type": "float",
+              "default": 1.0,
+              "range": "0.1-10 (slider 0.2-4); skeletal only",
+              "tooltip": "How far the wind moves a skeletal assembly",
+              "advanced": false,
+              "cite": "LeafCutEditorSettings.h:69; SLeafCutDialog.cpp:543-549"
+            }
+          ]
+        },
+        {
+          "title": "Nanite",
+          "settings": [
+            {
+              "name": "bNanite",
+              "displayName": "Nanite (section checkbox)",
+              "type": "bool",
+              "default": true,
+              "range": "Locked on for Assembly",
+              "tooltip": "Convert mesh to Nanite",
+              "advanced": false,
+              "cite": "LeafCutEditorSettings.h:57,81; SLeafCutDialog.cpp:552-560"
+            },
+            {
+              "name": "ShapePreservation",
+              "displayName": "Shape Preservation",
+              "type": "enum None|Preserve Area|Voxelize",
+              "default": "Voxelize (None if engine lacks Nanite voxels)",
+              "range": null,
+              "tooltip": "Nanite Shape Preservation. Preserve Area dilates open edges; Voxelize replaces distant geometry with voxels",
+              "advanced": false,
+              "cite": "LeafCutEditorSettings.h:60; SLeafCutDialog.cpp:84-87,562-590"
+            },
+            {
+              "name": "MaxEdgeLengthFactor",
+              "displayName": "Max Edge Length Factor",
+              "type": "float",
+              "default": 0.0,
+              "range": "0-FLT_MAX (slider 0-8, step 0.1)",
+              "tooltip": "Max Edge Length Factor (Nanite setting)",
+              "advanced": false,
+              "cite": "LeafCutEditorSettings.h:63,87; SLeafCutDialog.cpp:591-597"
+            }
+          ]
+        },
+        {
+          "title": "Output list (per mesh row)",
+          "settings": [
+            {
+              "name": "Row->Name",
+              "displayName": "Output Asset",
+              "type": "string",
+              "default": "<SM_|SK_><Name>_Opaque or _Assembly",
+              "range": "Same name as source = in place (opaque only)",
+              "tooltip": "The asset each mesh is converted into, next to it: an existing one is replaced",
+              "advanced": false,
+              "cite": "SLeafCutDialog.cpp:232-240,599-601; LeafCutAssets.cpp:301"
+            },
+            {
+              "name": "Remove",
+              "displayName": "Remove (row button)",
+              "type": "button",
+              "default": null,
+              "range": null,
+              "tooltip": "Remove",
+              "advanced": false,
+              "cite": "SLeafCutDialog.cpp:210-229"
+            }
+          ]
+        }
+      ],
+      "limits": [
+        "Assembly copies max 65534; bones max 65535; Nanite triangles max 2^31/32 (LeafCutSettings.h:49-56)",
+        "Mask bake resolution clamped 2048-4096 px (LeafCutOpacityMask.h:29-30; LeafCutOpacityMask.cpp:48-72)",
+        "Assemblies require r.Nanite.Foliage and engine Nanite Assemblies (UE 5.7+) (SLeafCutDialog.cpp:936-941; README.txt:5)",
+        "Voxelize requires engine Nanite voxels (LeafCutAssets.cpp:402-409)",
+        "Platforms Win64, Linux, Mac (LeafCut.uplugin:26-60)",
+        "In-place conversion cannot be undone (SLeafCutDialog.cpp:964-966)"
+      ],
+      "sources": [
+        "README.txt",
+        "LeafCut.uplugin",
+        "Source/LeafCutEditor/Public/LeafCutEditorSettings.h",
+        "Source/LeafCutEditor/Private/SLeafCutDialog.cpp",
+        "Source/LeafCutEditor/Private/LeafCutEditorModule.cpp",
+        "Source/LeafCutEditor/Public/LeafCutEditor.h",
+        "Source/LeafCut/Public/LeafCutSettings.h",
+        "Source/LeafCut/Public/Mask/LeafCutOpacityMask.h",
+        "Source/LeafCut/Private/Mask/LeafCutOpacityMask.cpp",
+        "Source/LeafCut/Private/Write/LeafCutAssets.cpp",
+        "Source/LeafCutAssembly/Public/LeafCutAssembly.h",
+        "Source/LeafCutAssembly/Private/LeafCutTuning.h",
+        "Source/LeafCutAssembly/Private/Write/LeafCutPartStore.cpp",
+        "Source/LeafCutAssembly/Private/Write/LeafCutDynamicWind.cpp"
+      ]
+    },
+    "toolkit": {
+      "name": "Foliage Toolkit Plus (includes Lite card cutter)",
+      "version": "0.92",
+      "root": "C:/Program Files/Epic Games/UE_5.8/Engine/Plugins/Marketplace/FoliageT8d804a2e3c31V2",
+      "entryPoints": [
+        {
+          "label": "Foliage",
+          "kind": "asset-editor-toolbar-button",
+          "where": "Static Mesh Editor toolbar, toggles the panel. Source/FoliageToolkitEditor/Private/FoliageToolkitEditorModule.cpp:106-144"
+        },
+        {
+          "label": "Foliage Toolkit",
+          "kind": "dockable-tab",
+          "where": "Static Mesh Editor tab plus workspace menu category. FoliageToolkitEditorModule.cpp:20,172-185"
+        },
+        {
+          "label": "New Foliage Recipe",
+          "kind": "content-browser-context-menu",
+          "where": "Static meshes, multi-select; creates/finds <Mesh>_Recipe, analyses, opens. Source/FoliageToolkitPlus/Private/FoliageToolkitPlusModule.cpp:51-106"
+        },
+        {
+          "label": "Foliage Recipe (asset editor: Viewport, Details, Regions, Atlas, Help)",
+          "kind": "asset-editor",
+          "where": "FoliageRecipeAssetDefinition.cpp:12,27; Editor/FoliageRecipeEditor.cpp:76-80,358-386"
+        },
+        {
+          "label": "Analyze (F7) / Convert (Ctrl+F7) / Place in level / Dump / Help (F1)",
+          "kind": "asset-editor-toolbar",
+          "where": "Editor/FoliageRecipeEditorCommands.cpp:74-78; FoliageRecipeEditor.cpp:632-647"
+        },
+        {
+          "label": "Drop recipe into level",
+          "kind": "actor-factory",
+          "where": "Editor/FoliageRecipeActorFactory.h:16; FoliageWindTree.h:15-21"
+        },
+        {
+          "label": "Project Settings > Plugins > Foliage Toolkit Plus / Foliage Toolkit Wind",
+          "kind": "project-settings",
+          "where": "FoliageToolkitPlusSettings.h:28-33; FoliageToolkitRuntimeSettings.h:21-26"
+        },
+        {
+          "label": "FoliageToolkit.Plus.Analyze|Convert|CardShapes|WindHeat|ShowAnalysis|ClearAnalysis",
+          "kind": "console-command",
+          "where": "FoliageToolkitPlusLibrary.cpp:270-288; FoliageAnalysisViewer.cpp:473-481"
+        },
+        {
+          "label": "Show > Developer > Foliage Tree Bones",
+          "kind": "viewport-show-flag",
+          "where": "FoliageTreeBonesView.cpp:24; CHANGELOG.md:12-15"
+        },
+        {
+          "label": "UFoliageToolkitLibrary / UFoliageToolkitPlusLibrary",
+          "kind": "blueprint-python-api",
+          "where": "FoliageToolkitLibrary.h:142-188; FoliageToolkitPlusLibrary.h:62-158"
+        }
+      ],
+      "workflow": {
+        "model": "Lite: interactive panel, one-shot output. Plus: persistent recipe asset + asset editor, re-convertible",
+        "storesSettings": "Lite: no (Transient settings object, FoliageToolkitPanelSettings.h:10-16). Plus: yes, on UFoliageRecipe <Mesh>_Recipe, storing only overrides of automatic (FoliageRecipeAsset.h:184-189)",
+        "rerunnable": "Plus: Convert any time; existing skeletal mesh is refilled so placed trees update (FoliageToolkitPlusLibrary.h:107-114; CHANGELOG.md:44). Lite: new uniquely named asset each cut",
+        "preview": "Lite: Estimate runs the exact cut without saving and overlays it on the mask (FoliageCardCutter.h:53-60; SFoliageToolkitPanel.cpp:230-231). Plus: Analyze shows pieces/regions/skeleton without assets, wind preview, 17+ visualization modes (FoliageRecipeEditorCommands.cpp:74; FoliageRecipeEditor.h:120-161)",
+        "batch": "Lite: one mesh per panel, batch only via script. Plus: context menu makes recipes for many meshes; batch convert via script/console (FoliageToolkitPlusModule.cpp:75-106)",
+        "inPlace": "Never; source mesh is never modified (FoliageToolkitLibrary.h:148-152; FoliageToolkitPlusLibrary.h:50-54)",
+        "notes": "Lite: per-slot checkboxes and hand-editable card shapes (Reset Shape / Reset All Edits). Plus: per-slot class map, per-region kind/wind group/frond bones/vector/alignment, per-piece overrides via JSON only (no editor UI found, unverified). Edits are undoable (FoliageRecipeEditor.cpp:867). Recipes export/import/diff/revert as JSON. Report JSON per mesh at <Project>/FoliageToolkit/<path>.report.json."
+      },
+      "outputs": [
+        "Lite: static mesh <Source>_Cut (unique name, duplicate of source; Nanite flag inherited, unverified) (FoliageToolkitLibrary.cpp:160-177)",
+        "Lite: <MI>_Opaque MICs, only when slot material is a MaterialInstanceConstant (FoliageToolkitLibrary.cpp:187-222)",
+        "Plus: Nanite skeletal mesh SK_<name> + _Skeleton + _PhysicsAsset (FoliageTreeConverter.cpp:668,1091-1146,1218)",
+        "Plus: Nanite assembly parts in <output>_Parts with a parts skeleton (FoliageAssembly.cpp:148,248,366-380)",
+        "Plus: Dynamic Wind data; shape preservation from project setting (FoliageTreeConverter.cpp:1144-1146). Opaque-material creation for Plus output not found (unverified)",
+        "Runtime: AFoliageWindTree actor (InstancedSkinnedMeshComponent + wind provider: Dynamic Wind or Toolkit wind on 5.8) (FoliageWindTree.h:15-78)",
+        "Debug: wind heat-map skeletal mesh copy (FoliageToolkitPlusLibrary.h:150-158)"
+      ],
+      "scripting": [
+        "UFoliageToolkitLibrary (BlueprintCallable, Python-visible): CutFoliageCards, EstimateFoliageCut, GetMaterialSlots (FoliageToolkitLibrary.h:153-188)",
+        "UFoliageToolkitPlusLibrary: GetReportPath, FindRecipe, CreateRecipe, DumpRecipe, ApplyRecipe, AnalyzeTree, ConvertTree, AnalyzeRecipe, ConvertRecipe, DumpSavedRecipe, RevertRecipeToSaved, DiffRecipeTexts, MakeWindHeatMesh (FoliageToolkitPlusLibrary.h:72-158)",
+        "AFoliageWindTree::SetMesh BlueprintCallable (FoliageWindTree.h:30-32)",
+        "Console commands FoliageToolkit.Plus.* (FoliageToolkitPlusLibrary.cpp:270-288)",
+        "Hand-edited card shapes: C++ only (FoliageToolkitLibrary.h:163-171)"
+      ],
+      "panels": [
+        {
+          "title": "Lite: Foliage Toolkit panel (Static Mesh Editor)",
+          "settings": [
+            {
+              "name": "SimplifyPercent",
+              "displayName": "Simplify",
+              "type": "float (% of shape size)",
+              "default": 8.0,
+              "range": "clamp 0.5-100, UI 1-30",
+              "tooltip": "How far the outline may be straightened; only outward, so no leaf is lost. Higher: fewer triangles, more empty area",
+              "advanced": false,
+              "cite": "FoliageToolkitPanelSettings.h:27-28"
+            },
+            {
+              "name": "InteriorSpacingPercent",
+              "displayName": "Interior Spacing",
+              "type": "float (%)",
+              "default": 47.0,
+              "range": "0-100",
+              "tooltip": "Spacing of extra interior points. Smaller: more even triangles, many more of them. 0 adds none",
+              "advanced": false,
+              "cite": "FoliageToolkitPanelSettings.h:34-35"
+            },
+            {
+              "name": "DilatePixels",
+              "displayName": "Mask Dilation",
+              "type": "int (texels)",
+              "default": 1,
+              "range": "0-8",
+              "tooltip": "Texels the mask is grown before tracing; margin for filtering and lower mips",
+              "advanced": false,
+              "cite": "FoliageToolkitPanelSettings.h:43-44"
+            },
+            {
+              "name": "MaskUVChannel",
+              "displayName": "Mask UV Channel",
+              "type": "int",
+              "default": 0,
+              "range": "0-7",
+              "tooltip": "UV channel the opacity mask is sampled from. Usually 0.",
+              "advanced": false,
+              "cite": "FoliageToolkitPanelSettings.h:47-48"
+            },
+            {
+              "name": "bCreateOpaqueMaterial",
+              "displayName": "Create Opaque Material Instance",
+              "type": "bool",
+              "default": true,
+              "range": null,
+              "tooltip": "Duplicates the cut slots' materials and overrides blend mode to Opaque",
+              "advanced": false,
+              "cite": "FoliageToolkitPanelSettings.h:54-55"
+            },
+            {
+              "name": "bShowDilation",
+              "displayName": "Show Dilation",
+              "type": "bool (preview)",
+              "default": true,
+              "range": null,
+              "tooltip": "Shows in blue what the dilation adds to the mask",
+              "advanced": false,
+              "cite": "FoliageToolkitPanelSettings.h:58-59"
+            },
+            {
+              "name": "bShowDiscardedArea",
+              "displayName": "Show Discarded Area",
+              "type": "bool (preview)",
+              "default": true,
+              "range": null,
+              "tooltip": "Shows in red card area the cut triangles no longer cover",
+              "advanced": false,
+              "cite": "FoliageToolkitPanelSettings.h:62-63"
+            },
+            {
+              "name": "SlotsToCut",
+              "displayName": "Material Slots (checkbox per slot)",
+              "type": "per-slot bool",
+              "default": "unchecked; masked slots labelled (masked)",
+              "range": null,
+              "tooltip": "Which material slots are cut",
+              "advanced": false,
+              "cite": "SFoliageToolkitPanel.cpp:209,455-489"
+            },
+            {
+              "name": "ShapeEdits",
+              "displayName": "Preview: drag green points / Reset Shape / Reset All Edits",
+              "type": "per-region polygon edits",
+              "default": "none",
+              "range": null,
+              "tooltip": "An edited shape stands in for the trace and no longer follows the settings",
+              "advanced": false,
+              "cite": "SFoliageToolkitPanel.cpp:133,185-196; FoliageCutSettings.h:18-26"
+            },
+            {
+              "name": "TrianglesToKeep",
+              "displayName": "(C++ only)",
+              "type": "set<int>",
+              "default": "empty",
+              "range": null,
+              "tooltip": "Triangles of a cut slot left uncut (e.g. palm frond stems); used by Plus",
+              "advanced": true,
+              "cite": "FoliageCutSettings.h:72-77"
+            }
+          ]
+        },
+        {
+          "title": "Plus: Recipe Details (UFoliageRecipe)",
+          "settings": [
+            {
+              "name": "Source",
+              "displayName": "Source",
+              "type": "soft StaticMesh",
+              "default": null,
+              "range": "read-only in Details",
+              "tooltip": "The static mesh this recipe converts",
+              "advanced": true,
+              "cite": "FoliageRecipeAsset.h:197-198; FoliageRecipeDetails.cpp:53-55"
+            },
+            {
+              "name": "Output",
+              "displayName": "Output",
+              "type": "string package path",
+              "default": "SK_<name> next to source",
+              "range": null,
+              "tooltip": "Package path of the skeletal mesh to write",
+              "advanced": true,
+              "cite": "FoliageRecipeAsset.h:207-209; FoliageRecipeDetails.cpp:56-66"
+            },
+            {
+              "name": "Settings.Wind.Sway[0]",
+              "displayName": "Trunk Sway",
+              "type": "float",
+              "default": 0.6,
+              "range": "0-1",
+              "tooltip": "How much trunk and thickest limbs move: 0 still, 0.6 engine preset",
+              "advanced": false,
+              "cite": "FoliageRecipeAsset.h:53-55; FoliageRecipeDetails.cpp:94-114"
+            },
+            {
+              "name": "Settings.Wind.Sway[1]",
+              "displayName": "Branch Sway",
+              "type": "float",
+              "default": 0.6,
+              "range": "0-1",
+              "tooltip": "How much the branches move; Dynamic Wind Influence at Medium detail",
+              "advanced": false,
+              "cite": "FoliageRecipeAsset.h:53-55; FoliageRecipeDetails.cpp:95,102"
+            },
+            {
+              "name": "Settings.Wind.Sway[2]",
+              "displayName": "Leaf Sway",
+              "type": "float",
+              "default": 0.6,
+              "range": "0-1",
+              "tooltip": "How much twigs, leaves and fronds move",
+              "advanced": false,
+              "cite": "FoliageRecipeAsset.h:53-55; FoliageRecipeDetails.cpp:96,103"
+            },
+            {
+              "name": "Settings.BoneDetail",
+              "displayName": "Detail",
+              "type": "enum Low|Medium|High",
+              "default": "Medium",
+              "range": "Low 2, Medium 4, High 6 bones per branch",
+              "tooltip": "How smoothly branches and fronds bend; more bones cost more",
+              "advanced": false,
+              "cite": "FoliageRecipeAsset.h:84-86; FoliageRecipeDetails.cpp:117"
+            },
+            {
+              "name": "Settings.Wind.bGroundCover",
+              "displayName": "Low Plant (Grass, Ferns)",
+              "type": "bool",
+              "default": false,
+              "range": null,
+              "tooltip": "On: every part moves fully from the base up (Dynamic Wind Ground Cover)",
+              "advanced": false,
+              "cite": "FoliageRecipeAsset.h:61-63; FoliageRecipeDetails.cpp:118-120"
+            },
+            {
+              "name": "Settings.Wind.bTrunkGroup",
+              "displayName": "Trunk Group",
+              "type": "bool",
+              "default": true,
+              "range": null,
+              "tooltip": "Thickest group moves as a trunk: slow lean with gusts",
+              "advanced": true,
+              "cite": "FoliageRecipeAsset.h:57-59; FoliageRecipeDetails.cpp:134"
+            },
+            {
+              "name": "Settings.Cut.SimplifyPercent",
+              "displayName": "Simplify Percent",
+              "type": "float (%)",
+              "default": 8.0,
+              "range": "clamp 0.5-100, UI 1-30",
+              "tooltip": "Outline straightening as % of shape size",
+              "advanced": false,
+              "cite": "FoliageRecipeAsset.h:31-32; FoliageRecipeDetails.cpp:123"
+            },
+            {
+              "name": "Settings.Cut.DilatePixels",
+              "displayName": "Dilate Pixels",
+              "type": "int",
+              "default": 1,
+              "range": "0-8",
+              "tooltip": "Texels the mask is grown before tracing",
+              "advanced": false,
+              "cite": "FoliageRecipeAsset.h:39-40; FoliageRecipeDetails.cpp:124"
+            },
+            {
+              "name": "Settings.Cut.InteriorSpacingPercent",
+              "displayName": "Interior Spacing Percent",
+              "type": "float (%)",
+              "default": 47.0,
+              "range": "0-100",
+              "tooltip": "Spacing of extra interior points; 0 adds none",
+              "advanced": true,
+              "cite": "FoliageRecipeAsset.h:35-36; FoliageRecipeDetails.cpp:135"
+            },
+            {
+              "name": "Settings.Cut.MaskUVChannel",
+              "displayName": "Mask UV Channel",
+              "type": "int",
+              "default": 0,
+              "range": "0-7",
+              "tooltip": "UV channel the mask is read through",
+              "advanced": true,
+              "cite": "FoliageRecipeAsset.h:43-44; FoliageRecipeDetails.cpp:136"
+            },
+            {
+              "name": "Settings.Collision.bEnabled",
+              "displayName": "Enabled",
+              "type": "bool",
+              "default": true,
+              "range": null,
+              "tooltip": "Physics asset capsules on structure pieces",
+              "advanced": false,
+              "cite": "FoliageRecipeAsset.h:71-72; FoliageRecipeDetails.cpp:128"
+            },
+            {
+              "name": "Settings.Collision.MinRadiusCm",
+              "displayName": "Min Radius Cm",
+              "type": "float (cm)",
+              "default": 8.0,
+              "range": ">=0",
+              "tooltip": "A structure piece gets capsules when its base radius is at least this",
+              "advanced": true,
+              "cite": "FoliageRecipeAsset.h:75-76; FoliageRecipeDetails.cpp:142-148"
+            },
+            {
+              "name": "Settings.MinBoneSpacingCm",
+              "displayName": "Min Bone Spacing Cm",
+              "type": "float (cm)",
+              "default": 5.0,
+              "range": ">=1",
+              "tooltip": "Minimum distance between bones along the centre line",
+              "advanced": true,
+              "cite": "FoliageRecipeAsset.h:89-90; FoliageRecipeDetails.cpp:137"
+            },
+            {
+              "name": "Settings.BoneSpacingRadii",
+              "displayName": "Bone Spacing Radii",
+              "type": "float",
+              "default": 1.5,
+              "range": ">=0 (0 off)",
+              "tooltip": "Bone spacing of at least this many branch radii: a thick trunk gets few bones",
+              "advanced": true,
+              "cite": "FoliageRecipeAsset.h:93-94; FoliageRecipeDetails.cpp:138"
+            },
+            {
+              "name": "Settings.PartTolerance",
+              "displayName": "Part Tolerance",
+              "type": "float",
+              "default": 1.0,
+              "range": "0-1",
+              "tooltip": "Cards of a region share one assembly part within this fraction of card length; lower = more parts",
+              "advanced": true,
+              "cite": "FoliageRecipeAsset.h:100-101; FoliageRecipeDetails.cpp:139"
+            },
+            {
+              "name": "Settings.VoxelDistanceM",
+              "displayName": "Voxel Distance M",
+              "type": "float (m)",
+              "default": 0.0,
+              "range": ">=0 (0 = project setting)",
+              "tooltip": "With Voxelize: distance at which the tree turns into Nanite voxels",
+              "advanced": false,
+              "cite": "FoliageRecipeAsset.h:104-105; FoliageRecipeDetails.cpp:130"
+            },
+            {
+              "name": "Slots",
+              "displayName": "Material Slots",
+              "type": "map slot name -> Auto|Structure|Static|Card|Geometry|Ignore",
+              "default": "Auto",
+              "range": null,
+              "tooltip": "What the pieces of this slot are. Auto: classed by their material",
+              "advanced": false,
+              "cite": "FoliageRecipeAsset.h:219-220; FoliageRecipeDetails.cpp:171-260; FoliageRecipeTypes.h:10-19"
+            }
+          ]
+        },
+        {
+          "title": "Plus: Regions tab / Atlas tab / viewport gizmo (per atlas region)",
+          "settings": [
+            {
+              "name": "Regions[id].Mode + Bones",
+              "displayName": "Kind: Auto / Part / Frond / Stuck to trunk / Keep skinned (+ Suggested, Accept all)",
+              "type": "enum",
+              "default": "Auto",
+              "range": null,
+              "tooltip": "Part: assembly node stored once; Frond: bends on bone chain; Stuck: follows trunk; Skinned: own leaf bone",
+              "advanced": false,
+              "cite": "SFoliageRegionList.cpp:434-441,459-470,568-595; FoliageRecipeEditor.cpp:2371"
+            },
+            {
+              "name": "Regions[id].WindGroup",
+              "displayName": "Wind (column)",
+              "type": "int",
+              "default": -1,
+              "range": "-1 to 2 (-1 = thin group)",
+              "tooltip": "The wind group of the bones of these cards: 0 moves least, 2 most",
+              "advanced": true,
+              "cite": "FoliageRecipeAsset.h:160-161; SFoliageRegionList.cpp:226,478-485"
+            },
+            {
+              "name": "Regions[id].FrondBoneSpacingCm",
+              "displayName": "Frond bones (column)",
+              "type": "float (cm)",
+              "default": 0.0,
+              "range": ">=0 (0 = from Detail)",
+              "tooltip": "The longest bone of a frond of this region",
+              "advanced": true,
+              "cite": "FoliageRecipeAsset.h:168-169; SFoliageRegionList.cpp:244-286,478-485"
+            },
+            {
+              "name": "Regions[id].Vector",
+              "displayName": "Atlas: card vector points (drag)",
+              "type": "Vector2f[]",
+              "default": "empty (guessed)",
+              "range": "0-1 mask UV; 2 points rigid, 3+ frond",
+              "tooltip": "First point attaches, last points; more points make a bending frond",
+              "advanced": false,
+              "cite": "FoliageRecipeAsset.h:152-154; FoliageRecipeEditor.cpp:2500"
+            },
+            {
+              "name": "Regions[id].AlignOffset",
+              "displayName": "Align gizmo: offset",
+              "type": "FVector (cm)",
+              "default": "0,0,0",
+              "range": null,
+              "tooltip": "Moves the region's part and every copy in the card frame",
+              "advanced": false,
+              "cite": "FoliageRecipeAsset.h:171-173; FoliageRecipeEditor.cpp:3183"
+            },
+            {
+              "name": "Regions[id].AlignRotation",
+              "displayName": "Align gizmo: rotation",
+              "type": "FRotator",
+              "default": "0,0,0",
+              "range": null,
+              "tooltip": "Turns the region's part around the attach point",
+              "advanced": false,
+              "cite": "FoliageRecipeAsset.h:175-177"
+            },
+            {
+              "name": "Regions[id].AlignScale",
+              "displayName": "Align gizmo: scale",
+              "type": "float",
+              "default": 1.0,
+              "range": "0.1-10",
+              "tooltip": "Scales the region's part around the attach point",
+              "advanced": false,
+              "cite": "FoliageRecipeAsset.h:179-181"
+            }
+          ]
+        },
+        {
+          "title": "Plus: per-piece overrides (JSON via ApplyRecipe; hidden from Details)",
+          "settings": [
+            {
+              "name": "Root",
+              "displayName": "Root",
+              "type": "string piece id",
+              "default": "piece closest to origin",
+              "range": null,
+              "tooltip": "Piece the skeleton starts from",
+              "advanced": true,
+              "cite": "FoliageRecipeAsset.h:214-216; FoliageRecipeDetails.cpp:32"
+            },
+            {
+              "name": "Pieces[id].Class",
+              "displayName": "Class",
+              "type": "enum Auto|Structure|Static|Card|Geometry|Ignore",
+              "default": "Auto",
+              "range": null,
+              "tooltip": "What this piece is",
+              "advanced": true,
+              "cite": "FoliageRecipeAsset.h:123-124"
+            },
+            {
+              "name": "Pieces[id].Parent",
+              "displayName": "Parent",
+              "type": "string piece id",
+              "default": "found by tool",
+              "range": null,
+              "tooltip": "Id of the piece this one grows from",
+              "advanced": true,
+              "cite": "FoliageRecipeAsset.h:126-128"
+            },
+            {
+              "name": "Pieces[id].Flip",
+              "displayName": "Flip",
+              "type": "enum Auto|Yes|No",
+              "default": "Auto",
+              "range": null,
+              "tooltip": "Yes swaps base and tip",
+              "advanced": true,
+              "cite": "FoliageRecipeAsset.h:130-132"
+            },
+            {
+              "name": "Pieces[id].WindGroup",
+              "displayName": "Wind Group",
+              "type": "int",
+              "default": -1,
+              "range": "-1 to 2",
+              "tooltip": "0 thick to 2 thin; -1 by radius",
+              "advanced": true,
+              "cite": "FoliageRecipeAsset.h:134-136"
+            },
+            {
+              "name": "Pieces[id].Collision",
+              "displayName": "Collision",
+              "type": "enum Auto|Yes|No",
+              "default": "Auto",
+              "range": null,
+              "tooltip": "Per-piece collision override",
+              "advanced": true,
+              "cite": "FoliageRecipeAsset.h:138-139"
+            },
+            {
+              "name": "Pieces[id].Bones",
+              "displayName": "Bones",
+              "type": "int",
+              "default": -1,
+              "range": "-1 to 64",
+              "tooltip": "Bones of each chain of the piece; -1 uses Bone Detail",
+              "advanced": true,
+              "cite": "FoliageRecipeAsset.h:141-143"
+            }
+          ]
+        },
+        {
+          "title": "Project Settings / cvars",
+          "settings": [
+            {
+              "name": "ShapePreservation",
+              "displayName": "Shape Preservation (Foliage Toolkit Plus > Nanite)",
+              "type": "enum Auto|None|PreserveArea|Voxelize",
+              "default": "Auto",
+              "range": null,
+              "tooltip": "Auto: Voxelize when engine Nanite voxels are on, else Preserve Area",
+              "advanced": false,
+              "cite": "FoliageToolkitPlusSettings.h:11-26,41-42"
+            },
+            {
+              "name": "VoxelDistanceM",
+              "displayName": "Voxel Distance M",
+              "type": "float (m)",
+              "default": 25.0,
+              "range": ">=0",
+              "tooltip": "Distance at which converted trees turn into voxels (2560 px wide, 90 deg view)",
+              "advanced": false,
+              "cite": "FoliageToolkitPlusSettings.h:44-50"
+            },
+            {
+              "name": "bShowAdvanced",
+              "displayName": "Show Advanced (Recipe Editor)",
+              "type": "bool",
+              "default": false,
+              "range": null,
+              "tooltip": "Shows the expert values in the recipe editor",
+              "advanced": false,
+              "cite": "FoliageToolkitPlusSettings.h:52-57"
+            },
+            {
+              "name": "WindShader",
+              "displayName": "Wind Shader (Foliage Toolkit Wind)",
+              "type": "enum Dynamic Wind (Epic)|Foliage Toolkit (UE 5.8+)",
+              "default": "DynamicWind",
+              "range": null,
+              "tooltip": "What moves the bones of converted trees with the level's wind",
+              "advanced": false,
+              "cite": "FoliageToolkitRuntimeSettings.h:12-19,33"
+            },
+            {
+              "name": "AnimationMinScreenSize",
+              "displayName": "Animation Min Screen Size",
+              "type": "float",
+              "default": 0.0,
+              "range": "clamp >=0, UI 0-1 (0 = engine 0.1)",
+              "tooltip": "Screen size below which trees stop animating; saves GPU in dense forests",
+              "advanced": false,
+              "cite": "FoliageToolkitRuntimeSettings.h:35-44"
+            },
+            {
+              "name": "FoliageToolkit.SkinnedTick",
+              "displayName": "cvar",
+              "type": "bool",
+              "default": false,
+              "range": null,
+              "tooltip": "Keep ticking instanced skinned components on GPU wind",
+              "advanced": true,
+              "cite": "FoliageSkinnedTreeSubsystem.cpp:20-26"
+            },
+            {
+              "name": "FoliageToolkit.TreeBones.Distance",
+              "displayName": "cvar",
+              "type": "float (cm)",
+              "default": 10000.0,
+              "range": null,
+              "tooltip": "Draw distance of the Foliage Tree Bones show flag",
+              "advanced": true,
+              "cite": "FoliageTreeBonesView.cpp:26-29"
+            }
+          ]
+        },
+        {
+          "title": "Plus: recipe editor viewport (preview only, not stored)",
+          "settings": [
+            {
+              "name": "WindStrength",
+              "displayName": "Wind slider (Min-Max)",
+              "type": "float",
+              "default": "unverified",
+              "range": "none to strong",
+              "tooltip": "The wind on the converted tree; moves the Result only",
+              "advanced": false,
+              "cite": "SFoliageRecipeViewport.cpp:1422,1439,1464"
+            },
+            {
+              "name": "WindDirection",
+              "displayName": "Wind compass",
+              "type": "angle",
+              "default": "unverified",
+              "range": null,
+              "tooltip": "Where the wind blows, seen from above; drag to turn",
+              "advanced": false,
+              "cite": "SFoliageRecipeViewport.cpp:1427"
+            },
+            {
+              "name": "VisualizationMode",
+              "displayName": "Visualization modes",
+              "type": "enum (17 modes + Nanite views)",
+              "default": "unverified",
+              "range": null,
+              "tooltip": "Source, Pieces, Skeleton, Base Mesh, Result, Foliage Grid, Wind Groups, Bones To Tip, Regions, Issues, Collision, etc.",
+              "advanced": false,
+              "cite": "FoliageRecipeEditor.h:120-161"
+            },
+            {
+              "name": "ToggleSideBySide",
+              "displayName": "Source next to the result",
+              "type": "toggle",
+              "default": "unverified",
+              "range": null,
+              "tooltip": "In Result and Heat map, the source stays shown and the result moves to its side",
+              "advanced": false,
+              "cite": "FoliageRecipeEditorCommands.cpp:92"
+            }
+          ]
+        }
+      ],
+      "limits": [
+        "All modules including Runtime are Win64-only (FoliageToolkitPlus.uplugin:16-56)",
+        "Plus requires UE 5.7-5.8 plus engine plugins DynamicWind and ProceduralVegetationEditor (Experimental) (CHANGELOG.md:36,46; FoliageToolkitPlus.uplugin:58-66)",
+        "Max traced area 8M texels per card rectangle, guards against tiling UVs (FoliageCutTypes.h:7-8; FoliageContourCutter.cpp:171)",
+        "Max 512 interior points per leaf shape (FoliageTriangulateLeaf.cpp:69)",
+        "Preview image max 2048 px (FoliageCutPreview.cpp:282)",
+        "Bones per piece chain max 64 (FoliageRecipeAsset.h:142)",
+        "Lite opaque MIC only made for slots whose material is already a MaterialInstanceConstant (FoliageToolkitLibrary.cpp:197-200)"
+      ],
+      "sources": [
+        "FoliageToolkitPlus.uplugin",
+        "CHANGELOG.md",
+        "Source/FoliageToolkitEditor/Private/FoliageToolkitEditorModule.cpp",
+        "Source/FoliageToolkitEditor/Private/FoliageToolkitPanelSettings.h",
+        "Source/FoliageToolkitEditor/Private/SFoliageToolkitPanel.cpp",
+        "Source/FoliageToolkitEditor/Public/FoliageCardCutter.h",
+        "Source/FoliageToolkitEditor/Public/FoliageToolkitLibrary.h",
+        "Source/FoliageToolkitEditor/Private/FoliageToolkitLibrary.cpp",
+        "Source/FoliageToolkitEditor/Private/FoliageContourCutter.cpp",
+        "Source/FoliageCutCore/Public/FoliageCutSettings.h",
+        "Source/FoliageCutCore/Public/FoliageCutTypes.h",
+        "Source/FoliageToolkitPlus/Public/FoliageRecipeAsset.h",
+        "Source/FoliageToolkitPlus/Public/FoliageToolkitPlusSettings.h",
+        "Source/FoliageToolkitPlus/Public/FoliageToolkitPlusLibrary.h",
+        "Source/FoliageToolkitPlus/Private/FoliageToolkitPlusModule.cpp",
+        "Source/FoliageToolkitPlus/Private/FoliageTreeConverter.cpp",
+        "Source/FoliageToolkitPlus/Private/FoliageAssembly.cpp",
+        "Source/FoliageToolkitPlus/Private/Editor/FoliageRecipeEditor.cpp",
+        "Source/FoliageToolkitPlus/Private/Editor/FoliageRecipeEditorCommands.cpp",
+        "Source/FoliageToolkitPlus/Private/Editor/FoliageRecipeDetails.cpp",
+        "Source/FoliageToolkitPlus/Private/Editor/SFoliageRegionList.cpp",
+        "Source/FoliageToolkitPlus/Private/Editor/SFoliageRecipeViewport.cpp",
+        "Source/FoliageToolkitRuntime/Public/FoliageWindTree.h",
+        "Source/FoliageToolkitRuntime/Public/FoliageToolkitRuntimeSettings.h"
+      ]
+    },
+    "maskednanite": {
+      "name": "Masked Material to Nanite",
+      "version": "2.0.0",
+      "root": "X:/TreeToolComparison/Plugins/MaskedMa28626c1b0834V4",
+      "entryPoints": [
+        {
+          "label": "Convert Mesh to Nanite",
+          "kind": "content-browser-scripted-asset-action",
+          "where": "Editor Utility Blueprint Content/BP_ConvertToNanite (subclass of UMaskedMaterialToNaniteAction, UAssetActionUtility on UStaticMesh), category Nanite; engine shows a parameter dialog (unverified live). MaskedMaterialToNaniteAction.h:12-30; MaskedMaterialToNaniteAction.cpp:11-14"
+        },
+        {
+          "label": "UMeshScriptingUtilities",
+          "kind": "blueprint-python-api",
+          "where": "Public/MeshScriptingUtilities.h:59-128"
+        }
+      ],
+      "workflow": {
+        "model": "one-shot parameter dialog",
+        "storesSettings": "No (plugin stores nothing; whether the engine dialog remembers values is unverified)",
+        "rerunnable": "Only after deleting/renaming the previous <Mesh>_Nanite; conversion fails if it exists (MeshScriptingUtilities.cpp:243-252)",
+        "preview": "None",
+        "batch": "Yes: all selected static meshes, one shared options set and one shared slot-name->mask map, cancellable progress (MaskedMaterialToNaniteAction.cpp:16-43)",
+        "inPlace": "No: always creates <Mesh>_Nanite next to the source",
+        "notes": "User supplies a mask texture per material slot name; masked slots without a mask are not cut and keep their masked material (MeshScriptingUtilities.cpp:318-330). Clip value is entered manually, not read from the material (MeshScriptingUtilities.h:33-35). Non-masked slots are copied unchanged."
+      },
+      "outputs": [
+        "Static mesh <Mesh>_Nanite, Nanite enabled, default Nanite settings otherwise (MeshScriptingUtilities.cpp:372-385)",
+        "Opaque MICs <Material>_Opaque next to source material (or next to new mesh for engine content), reused if present (MeshScriptingUtilities.cpp:395-438)",
+        "No skeletal mesh, assembly, wind or runtime module (MaskedMaterialToNanite.uplugin:16-37)"
+      ],
+      "scripting": [
+        "ConvertMaskedMeshToNanite(Mesh, Masks, Options, bCreateOpaqueMaterials=true, bOptimizeMesh=false, Debug) BlueprintCallable (MeshScriptingUtilities.h:111-114)",
+        "ApplyMaskContoursToMesh(DynamicMesh, Mask, Options, Debug), Geometry Script building block (MeshScriptingUtilities.h:91-94)",
+        "ApplyMaskToMesh(DynamicMesh, Mask, UVSetIndex, MaskClipValue, ColorChannel, Debug), legacy per-vertex delete (MeshScriptingUtilities.h:76-79)",
+        "CreateOpaqueInstanceForMaterial(SourceMaterial, FallbackPath) (MeshScriptingUtilities.h:126-128)",
+        "C++: UE::MaskedMaterialToNanite::CutMeshToMask (MaskContourCut.h:60-61)"
+      ],
+      "panels": [
+        {
+          "title": "Convert Mesh to Nanite (action parameters)",
+          "settings": [
+            {
+              "name": "Masks",
+              "displayName": "Masks",
+              "type": "map<FName slot, Texture2D>",
+              "default": "empty",
+              "range": null,
+              "tooltip": "Mask texture for each masked material slot, by slot name",
+              "advanced": false,
+              "cite": "MaskedMaterialToNaniteAction.h:28-30; MeshScriptingUtilities.h:102"
+            },
+            {
+              "name": "MaskOptions.UVSetIndex",
+              "displayName": "UV Set Index",
+              "type": "int",
+              "default": 0,
+              "range": "0-7",
+              "tooltip": "UV channel of the mesh used to sample the mask",
+              "advanced": false,
+              "cite": "MeshScriptingUtilities.h:29-31"
+            },
+            {
+              "name": "MaskOptions.MaskClipValue",
+              "displayName": "Mask Clip Value",
+              "type": "float",
+              "default": 0.33,
+              "range": "0-1",
+              "tooltip": "Mask values below this are cut away. Match it to the material's Opacity Mask Clip Value.",
+              "advanced": false,
+              "cite": "MeshScriptingUtilities.h:33-35"
+            },
+            {
+              "name": "MaskOptions.ColorChannel",
+              "displayName": "Color Channel",
+              "type": "enum Red|Green|Blue|Alpha",
+              "default": "Alpha",
+              "range": null,
+              "tooltip": "Texture channel holding the mask",
+              "advanced": false,
+              "cite": "MeshScriptingUtilities.h:15-21,37-39"
+            },
+            {
+              "name": "MaskOptions.ContourTolerance",
+              "displayName": "Contour Tolerance",
+              "type": "float (texels)",
+              "default": 0.25,
+              "range": "clamp >=0, UI max 4",
+              "tooltip": "How far the outline may stray from the traced mask edge when simplified; 0 keeps every point",
+              "advanced": false,
+              "cite": "MeshScriptingUtilities.h:41-46"
+            },
+            {
+              "name": "MaskOptions.MinFeatureArea",
+              "displayName": "Min Feature Area",
+              "type": "float (sq. texels)",
+              "default": 4.0,
+              "range": "clamp >=0, UI max 64",
+              "tooltip": "Opaque islands smaller than this are dropped and smaller holes filled; 0 keeps all",
+              "advanced": false,
+              "cite": "MeshScriptingUtilities.h:48-53"
+            },
+            {
+              "name": "bCreateOpaqueMaterials",
+              "displayName": "Create Opaque Materials",
+              "type": "bool",
+              "default": "Unticked in dialog (C++ default true)",
+              "range": null,
+              "tooltip": "Make opaque copies of the masked materials for the output. Off in the action dialog; tick it or the output stays masked",
+              "advanced": false,
+              "cite": "MaskedMaterialToNaniteAction.h:29-30; MeshScriptingUtilities.h:103-107"
+            },
+            {
+              "name": "bOptimizeMesh",
+              "displayName": "Optimize Mesh",
+              "type": "bool",
+              "default": false,
+              "range": null,
+              "tooltip": "Merge coplanar triangles of the cut sections",
+              "advanced": false,
+              "cite": "MeshScriptingUtilities.h:108; MeshScriptingUtilities.cpp:341-345"
+            }
+          ]
+        }
+      ],
+      "limits": [
+        "Traced texels max 2^28 per mesh UV extent, else error 'more than can be traced' (MaskContourCut.cpp:22-23,1561-1569)",
+        "UV seams can open; triangles without UVs on the chosen layer are kept unchanged (MaskContourCut.h:49-52)",
+        "Mask must be a Texture2D with readable, built source data; material-graph masks are not evaluated (MeshScriptingUtilities.cpp:53-93,110-114)",
+        "Fails if <Mesh>_Nanite already exists (MeshScriptingUtilities.cpp:243-252)",
+        "Platforms Win64, Linux, Mac; depends on GeometryScripting and MeshModelingToolset (MaskedMaterialToNanite.uplugin:21-46)"
+      ],
+      "sources": [
+        "MaskedMaterialToNanite.uplugin",
+        "Content/BP_ConvertToNanite.uasset (CallableFunctions metadata)",
+        "Source/MaskedMaterialToNanite/Private/MaskedMaterialToNaniteAction.h",
+        "Source/MaskedMaterialToNanite/Private/MaskedMaterialToNaniteAction.cpp",
+        "Source/MaskedMaterialToNanite/Public/MeshScriptingUtilities.h",
+        "Source/MaskedMaterialToNanite/Private/MeshScriptingUtilities.cpp",
+        "Source/MaskedMaterialToNanite/Public/MaskContourCut.h",
+        "Source/MaskedMaterialToNanite/Private/MaskContourCut.cpp"
+      ]
+    }
+  }
+}

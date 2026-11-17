@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111318">
+  <meta name="description" content="LeafCut, Foliage Toolkit Plus and Masked Material to Nanite measured on seven masked-card foliage meshes in UE 5.8: opaque conversion, card geometry, silhouette match, GPU stage timings and settings.">
+  <title>LeafCut vs Foliage Toolkit vs Masked Material to Nanite: UE 5.8 foliage plugins compared</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="data.js" defer></script>
+  <script src="single-card.js" defer></script>
+  <script src="overdraw-curves.js" defer></script>
+  <script src="plugin-options.js" defer></script>
+  <script src="app.js" defer></script>
+  <script src="overview.js" defer></script>
+  <script src="gpu-stages.js" defer></script>
+  <script src="stages.js" defer></script>
+  <script src="wind-data.js" defer></script>
+  <script src="wind-view.js" defer></script>
+</head>
+<body>
+  <header class="masthead">
+    <a class="wordmark" href="#top">Nanite foliage comparison</a>
+    <details id="section-menu" class="section-menu" open>
+      <summary>Sections</summary>
+      <nav aria-label="Sections">
+        <a href="#plants">Test meshes</a><a href="#how">Card geometry</a><a href="#coverage">Coverage</a><a href="#control">Controls</a><a href="#cost">Triangles</a><a href="#verdict">Summary</a><span class="nav-sep" aria-hidden="true"></span><a href="#details">Evidence</a><a href="#gpu">GPU</a><a href="#wind" hidden>Wind</a><a href="#method">Method</a>
+      </nav>
+    </details>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="title">
+      <p class="eyebrow">Unreal Engine 5.8 foliage plugins</p>
+      <h1 id="title">LeafCut, Foliage Toolkit and Masked Material to Nanite compared</h1>
+      <p class="lede">LeafCut, Foliage Toolkit Plus and Masked Material to Nanite each replace alpha-masked foliage cards with geometry cut to the leaf shape, so the material can be opaque and Nanite no longer evaluates opacity over the transparent card area. All three were run on the same seven Fab meshes: two grasses, a bush, ivy and three trees.</p>
+      <div class="plugin-intros">
+        <article class="intro leafcut">
+          <h2><span class="swatch leafcut"></span>LeafCut</h2>
+          <p>Bakes opacity from each material and cuts automatically. Trees become skeletal Nanite assemblies.</p>
+        </article>
+        <article class="intro toolkit">
+          <h2><span class="swatch toolkit"></span>Foliage Toolkit Plus</h2>
+          <p>Cut preview, hand-editable outlines and saved tree recipes. Small plants use the Lite cutter. Windows only.</p>
+        </article>
+        <article class="intro maskednanite">
+          <h2><span class="swatch maskednanite"></span>Masked Material to Nanite</h2>
+          <p>Cuts static meshes from a mask texture and threshold assigned per material. Callable from Blueprint and Python.</p>
+        </article>
+      </div>
+      <p class="correction">Masked Material to Nanite needs a mask texture and threshold for each material, and Foliage Toolkit's threshold on the two grasses was set the same way; where a material squares or scales alpha before clipping, the threshold is the equivalent texture value. The only quality setting changed from default was Foliage Toolkit's Simplify on the ivy (2 instead of 8). No settings sweep was run, so triangle counts and outline scores describe these settings, not each plugin's best result.</p>
+    </section>
+
+    <section id="plants" class="band" aria-labelledby="plants-title">
+      <div class="section-heading">
+        <h2 id="plants-title">Test meshes</h2>
+        <p class="section-intro">Four small plants, three trees. The set includes isolated leaves, dense canopies, hanging ivy, mixed bark and leaf cards, and view-dependent opacity. Select a mesh to open its matched image comparison.</p>
+      </div>
+      <div id="source-cards" class="source-cards"></div>
+    </section>
+
+    <section id="how" class="band" aria-labelledby="how-title">
+      <h2 id="how-title">Single-card geometry</h2>
+      <p class="section-intro">One source card per plant, unfolded onto its texture, with the triangles each plugin saved for that card. Overlap, extra and lost area are texel measurements on that card only.</p>
+      <div id="card-study"></div>
+    </section>
+
+    <section id="coverage" class="band" aria-labelledby="coverage-title">
+      <h2 id="coverage-title">Opaque conversion</h2>
+      <p class="section-intro">An output counts only if every material on it is opaque; a masked material left on the output keeps the masked Nanite cost there. The limits below come from plugin source and did not change with any setting we found.</p>
+      <div class="limit-cards">
+        <article class="limit leafcut"><h3><span class="swatch leafcut"></span>LeafCut</h3><ul>
+          <li>Evaluates each material's opacity-mask graph rather than reading a single texture.</li>
+          <li>Opacity that changes with viewing angle is fixed at one angle by the cut.</li>
+          <li>No hard limit was hit on the seven test meshes.</li></ul></article>
+        <article class="limit toolkit"><h3><span class="swatch toolkit"></span>Foliage Toolkit</h3><ul>
+          <li>Fixed limit of 8 million texels per card region. A card spread over a large tiling texture, such as bark, stays masked.</li>
+          <li>Tree output (Plus) keeps the source's masked materials. We found no setting that makes them opaque.</li>
+          <li>Reads the mask texture directly. If the material changes alpha before clipping, you match the threshold by hand.</li></ul></article>
+        <article class="limit maskednanite"><h3><span class="swatch maskednanite"></span>Masked Material to Nanite</h3><ul>
+          <li>Takes one mask texture, channel and threshold per material and does not evaluate the material graph. Alpha that is squared or scaled before clipping maps to an equivalent threshold; opacity that varies with viewing angle cannot be represented.</li>
+          <li>Fixed limit of 268 million texels of UV area per mesh, which large tiling bark can exceed.</li>
+          <li>Static meshes only.</li></ul></article>
+      </div>
+      <h3>Results on the test meshes</h3>
+      <p class="hint">Seven meshes from Fab packs: two ground plants, a bush, ivy and three trees. They are shown under <a href="#plants">Test meshes</a>. "Opaque" means every material on the output is opaque.</p>
+      <div class="table-scroll"><table id="coverage-grid" class="coverage"><caption class="sr-only">Conversion result per test mesh and plugin</caption><thead></thead><tbody></tbody></table></div>
+      <div hidden><table id="glance-table"><thead></thead><tbody></tbody></table><ul id="takeaways"></ul></div>
+    </section>
+
+    <section id="control" class="band" aria-labelledby="control-title">
+      <h2 id="control-title">Controls</h2>
+      <p class="section-intro">LeafCut derives its inputs from the material. Foliage Toolkit exposes the most settings and saves them per tree. Masked Material to Nanite requires the mask inputs per material.</p>
+      <div class="table-scroll"><table id="control-table" class="matrix"><caption class="sr-only">How each plugin handles each part of the job</caption><thead></thead><tbody></tbody></table></div>
+      <div id="ui-strip" class="ui-strip"></div>
+    </section>
+
+    <section id="cost" class="band" aria-labelledby="cost-title">
+      <h2 id="cost-title">Triangles versus accuracy</h2>
+      <p class="section-intro">Triangle count and outline fit trade against each other, and each plugin's settings sit at a different point. On the four small meshes, LeafCut and Masked Material to Nanite matched the outline about equally, with Masked Material to Nanite using two to five times the triangles. Foliage Toolkit used the fewest triangles and matched the outline less closely. Trees are excluded because the plugins count assembly triangles differently.</p>
+      <div id="cost-chart" class="cost-wrap"></div>
+      <p class="section-intro"><span id="cost-gpu"></span> <a href="#gpu">Timings and stages</a></p>
+    </section>
+
+    <section id="verdict" class="band" aria-labelledby="verdict-title">
+      <h2 id="verdict-title">Summary</h2>
+      <p><span class="swatch leafcut"></span><strong>LeafCut</strong> produced opaque output for all seven meshes, trees included, without per-material setup. It has no preview, no per-material settings and no Blueprint or Python API.<span id="verdict-leafcut-gpu"></span></p>
+      <p><span class="swatch toolkit"></span><strong>Foliage Toolkit</strong> has the most controls. Its tree output kept masked leaf materials on all three trees, and the bush output kept a masked bark card. The small-plant cutter is also available free as Lite.</p>
+      <p><span class="swatch maskednanite"></span><strong>Masked Material to Nanite</strong> cut closely on the four small meshes at the highest triangle counts. It outputs static meshes only and needs a mask texture and threshold assigned per material; a fixed texture threshold cannot represent the view-angle fade on the oak and maple leaves.</p>
+      <h3>Prices and requirements</h3>
+      <div class="table-scroll"><table class="matrix specs"><caption class="sr-only">Prices and requirements</caption>
+        <thead><tr><th></th><th scope="col"><span class="swatch leafcut"></span>LeafCut</th><th scope="col"><span class="swatch toolkit"></span>Foliage Toolkit</th><th scope="col"><span class="swatch maskednanite"></span>Masked Material to Nanite</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Price</th><td>$24.99</td><td>$24.99 (Plus)<small>Lite cutter free; small plants only</small></td><td>$9.99<small>Source also public on GitHub</small></td></tr>
+          <tr><th scope="row">Engine</th><td>Tested on 5.8<small>Nanite assemblies need 5.7+</small></td><td>Plus 5.7–5.8, Lite 5.1–5.8<small>Plus needs the Experimental Procedural Vegetation Editor plugin</small></td><td>Tested on 5.8<small>Needed a project-local fix for a single-material array crash in UE 5.8</small></td></tr>
+          <tr><th scope="row">Platforms</th><td>Win64, Linux, Mac</td><td>Win64 only</td><td>Win64, Linux, Mac</td></tr>
+          <tr><th scope="row">Tree output</th><td>Skeletal Nanite assembly with wind data</td><td>Skeletal Nanite assembly, tunable wind, runtime wind actor</td><td>Static mesh</td></tr>
+          <tr><th scope="row">Blueprint / Python</th><td>No<small>C++ functions only</small></td><td>Yes</td><td>Yes</td></tr>
+        </tbody>
+      </table></div>
+      <p class="hint">Prices are from the Fab listings in November 2026, excluding tax: <a href="https://www.fab.com/listings/e463e374-522f-42d8-bae0-7f274993a59f" target="_blank" rel="noreferrer">LeafCut</a>, <a href="https://www.fab.com/listings/a1dcf406-75b5-4119-96ba-6c14984a23c3" target="_blank" rel="noreferrer">Foliage Toolkit Plus</a>, <a href="https://www.fab.com/listings/2107cdea-d0a3-40c6-933f-b816806b0246" target="_blank" rel="noreferrer">Lite</a>, <a href="https://www.fab.com/listings/f59fbd35-f5da-4435-9a0b-af464d10a49c" target="_blank" rel="noreferrer">Masked Material to Nanite</a> (<a href="https://github.com/krojew/MaskedMaterialToNanite" target="_blank" rel="noreferrer">GitHub</a>).</p>
+    </section>
+
+    <div class="part-divider" id="details">
+      <p class="eyebrow">The evidence</p>
+      <p>Matched image comparisons, outline scores, GPU timings and tree skeletons. Per-plant settings are listed under the image comparison.</p>
+    </div>
+
+
+    <section id="compare" class="band" aria-labelledby="compare-title">
+      <div class="section-heading">
+        <h2 id="compare-title">Image comparison</h2>
+        <p class="section-intro">Both versions use the same camera, pose and lighting. Use the wipe slider to inspect their edges in the same image position.</p>
+      </div>
+      <div class="control-stack shared-controls">
+        <div class="control-row"><span class="control-label">Plant</span><div id="asset-picker" class="chips" role="group" aria-label="Plant"></div></div>
+        <div class="control-row"><span class="control-label">Show</span><div id="view-controls" class="segmented" role="group" aria-label="Image type"></div></div>
+        <div class="control-row"><span class="control-label">Camera</span><div id="angle-controls" class="segmented" role="group" aria-label="Camera angle"></div><div id="distance-controls" class="segmented" role="group" aria-label="Camera distance"></div></div>
+        <div class="control-row"><span class="control-label">Layout</span><div id="layout-controls" class="segmented" role="group" aria-label="Image layout"></div></div>
+      </div>
+      <p id="view-help" class="hint"></p>
+      <div class="comparison-display">
+        <div class="variant-selectors">
+          <div class="variant-selector"><h3>Left image</h3><div id="left-picker" class="segmented" role="group" aria-label="Left image version"></div></div>
+          <div class="variant-selector"><h3>Right image</h3><div id="right-picker" class="segmented" role="group" aria-label="Right image version"></div></div>
+        </div>
+        <div class="viewer-grid" id="viewers"></div>
+      </div>
+      <div class="inspection-controls"><label for="inspection-zoom">Zoom <input id="inspection-zoom" type="range" min="1" max="4" step="0.25" value="1"><output id="inspection-zoom-value" for="inspection-zoom">1×</output></label><button id="inspection-reset" type="button">Reset</button><span class="hint">Drag an image to pan when zoomed.</span></div>
+      <p id="capture-measurements" class="readout" aria-live="polite" hidden></p>
+      <p id="asset-note" class="asset-note" hidden></p>
+      <details class="disclosure"><summary>All measurements for this plant</summary>
+        <div class="table-scroll"><table id="metrics" class="data-table compact"><caption class="sr-only">Measurements for the selected plant</caption><thead></thead><tbody></tbody></table></div>
+        <p class="hint">— not measured. N/A does not apply to this output. Nanite input triangles are what the plugin saved, not what is drawn per frame.</p>
+      </details>
+      <details class="disclosure"><summary>Plugin settings and asset paths</summary><div id="settings"></div></details>
+    </section>
+
+    <section id="outline" class="band" aria-labelledby="outline-title">
+      <div class="section-heading">
+        <h2 id="outline-title">Whole-plant silhouette</h2>
+        <p class="section-intro">The card comparison measures the cut itself. This score checks the assembled plant's visible shape, including overlap between cards. Each source and output was rendered from the same fixed cameras. <strong>Overlap</strong> is shared silhouette pixels divided by all pixels covered by either; <strong>lost</strong> and <strong>extra</strong> are removed and added pixels as percentages of the source's visible area.</p>
+      </div>
+      <div class="table-scroll"><table id="outline-table" class="data-table"><caption class="sr-only">Outline overlap, lost and extra area, and triangle count per plant and plugin</caption><thead></thead><tbody></tbody></table></div>
+      <p class="hint">The Camera views column counts matched angle-and-distance captures pooled into the score: five for wildflowers, three for trees, one for the other plants. Compare plugins within a plant. Hatched rows mark incompatible cases; any numbers in them describe a partial masked output. Tree assembly triangle totals are omitted because the plugins define them differently.</p>
+    </section>
+
+    <section id="gpu" class="band" aria-labelledby="gpu-title">
+      <div class="section-heading">
+        <h2 id="gpu-title">GPU time</h2>
+        <p id="gpu-intro" class="section-intro"></p>
+      </div>
+      <div id="gpu-legend" class="legend" aria-hidden="true"></div>
+      <div id="gpu-chart" class="gpu-chart"></div>
+      <p class="hint">Lower is faster. Whole-frame GPU time includes sky, ground, shadows and post-processing in every bar. The original masked cards with Nanite switched on are the baseline; converted results receive a timing only when they are fully opaque.</p>
+
+      <div id="gpu-stages" class="stage-block" hidden>
+        <h3>GPU stages</h3>
+        <p class="hint">Exclusive Graphics-queue timer scopes from the same frames, grouped. <strong>Main-view Nanite</strong> is Nanite visibility-buffer rasterization and its base pass for the camera view. <strong>Shadows</strong> is shadow depth rendering and projection, including the foliage drawn into shadow depths. Scopes include queue waits and omit async compute, so groups are not a partition of whole-frame GPU time and are not stacked.</p>
+        <p id="stage-finding" class="section-intro"></p>
+        <div class="control-row"><span class="control-label">Plant</span><div id="stage-picker" class="segmented" role="group" aria-label="Plant for GPU stages"></div></div>
+        <div id="stage-missing" class="missing-row" hidden></div>
+        <div id="stage-chart" class="gpu-chart stage-chart"></div>
+        <p class="hint">Median of three run medians, 599 frames per run. Brackets: change from the masked baseline in ms.</p>
+        <details class="disclosure"><summary>CPU thread times for this plant</summary>
+          <div class="table-scroll"><table id="stage-cpu" class="data-table compact"><caption class="sr-only">GPU and CPU thread medians for the selected plant</caption><thead><tr><th scope="col">Version</th><th scope="col" class="num">Whole-frame GPU · ms</th><th scope="col" class="num">Render thread · ms</th><th scope="col" class="num">Game thread · ms</th><th scope="col" class="num">Skinning scene setup · ms</th><th scope="col">Component</th></tr></thead><tbody></tbody></table></div>
+          <p class="hint">Wind was off. Thread times are broad counters. Skinning scene setup is render-thread bookkeeping that also runs in scenes with no skinned meshes; it is not a bone or wind simulation cost.</p>
+        </details>
+        <h4 class="stage-table-title">Change from masked baseline, all timed results · ms</h4>
+        <div class="table-scroll"><table id="stage-table" class="data-table compact stage-table"><caption class="sr-only">Change in milliseconds from each plant's masked baseline, per GPU stage group</caption><thead></thead><tbody></tbody></table></div>
+      </div>
+
+      <div class="field-explorer">
+        <h3>The test field from the camera path's start</h3>
+        <div class="control-stack">
+          <div class="control-row"><span class="control-label">Plant</span><div id="field-picker" class="chips" role="group" aria-label="Plant"></div></div>
+        </div>
+        <p id="field-summary" class="hint"></p>
+        <div id="field-missing" class="missing-row" hidden></div>
+        <div id="field-captures" class="field-grid"></div>
+        <details class="disclosure"><summary>Per-run timings for this plant</summary>
+          <div class="table-scroll"><table id="field-table" class="data-table compact"><caption class="sr-only">Repeated GPU times and CPU timing for the selected plant</caption><thead><tr><th scope="col">Version</th><th scope="col">GPU, 3 runs · ms</th><th scope="col">GPU p95 · ms</th><th scope="col">Frame · ms</th><th scope="col">Game / render thread · ms</th></tr></thead><tbody></tbody></table></div>
+          <p class="hint">Each run's median frame, then the median of three runs. p95 is the median of the three per-run 95th percentiles. Screenshots come from a separate, untimed pass along the same path.</p>
+          <div id="field-provenance"></div>
+        </details>
+      </div>
+
+      <details class="disclosure failures">
+        <summary>Why some results weren't timed</summary>
+        <div id="failure-cards" class="failure-grid"></div>
+      </details>
+
+      <details class="disclosure" id="overdraw">
+        <summary>Nanite overdraw in the test fields</summary>
+        <div id="overdraw-body"></div>
+      </details>
+    </section>
+
+    <section id="trees" class="band" aria-labelledby="trees-title">
+      <div class="section-heading">
+        <h2 id="trees-title">Tree skeletons</h2>
+        <p class="section-intro">For trees, LeafCut and Foliage Toolkit build skeletal assemblies: a skinned trunk with leaf parts placed on bones. Masked Material to Nanite produces static meshes when it succeeds, so it has no skeleton to show. The lines below connect parent and child bones from the saved skeleton, projected over the tree's front-view wireframe.</p>
+      </div>
+      <div class="control-row"><span class="control-label">Tree</span><div id="skeleton-picker" class="chips" role="group" aria-label="Tree"></div></div>
+      <p id="skeleton-description" class="hint"></p>
+      <div id="skeleton-captures" class="figure-grid"></div>
+      <p class="hint">Bone count alone does not describe deformation quality.</p>
+    </section>
+
+    <section id="wind" class="band" aria-labelledby="wind-title" hidden>
+      <div class="section-heading">
+        <h2 id="wind-title">Wind cost</h2>
+        <p class="section-intro">Each tree output was timed in a field of <span id="wind-count"></span> trees of one species, with Unreal's DynamicWind on and then off, on the same placements and camera path. LeafCut and Foliage Toolkit build skeletal trees; Masked Material to Nanite outputs static meshes and is not included. Each change is that output's own wind overhead. Toolkit's trees keep masked leaf materials, so its times include masked rendering and are not a like-for-like comparison with LeafCut.</p>
+      </div>
+      <div id="wind-facts" class="wind-facts"></div>
+      <p id="wind-finding" class="section-intro"></p>
+      <h3>Whole-frame GPU change with wind on · ms</h3>
+      <div id="wind-chart" class="gpu-chart"></div>
+      <p class="hint">Bar: change in the median of three run medians. Line and range: wind-on minus wind-off for the most extreme pairings of the three run medians, not a confidence interval. Bone counts are per tree skeleton; DynamicWind poses a small set of shared skeleton orientations on the GPU, so the work is not one bone solve per tree.</p>
+      <div class="control-row"><span class="control-label">Tree</span><div id="wind-picker" class="segmented" role="group" aria-label="Tree for wind timing"></div></div>
+      <p id="wind-tree-note" class="hint"></p>
+      <div id="wind-frames" class="field-grid wind-frames"></div>
+      <p class="hint">Fixed camera, two sample frames about 5 s and 7 s into the wind-on run, not continuous video. Open a frame and use Compare to flip between them.</p>
+      <div class="table-scroll"><table id="wind-detail" class="data-table compact stage-table"><caption class="sr-only">Wind off, on and change for the selected tree</caption><thead></thead><tbody></tbody></table></div>
+      <p class="hint">Stage rows are exclusive Graphics-queue scopes and do not add up to whole-frame GPU time. Hover a change for its run-median range.</p>
+      <details class="disclosure"><summary>CPU cost of wind setup</summary>
+        <div class="table-scroll"><table id="wind-cpu" class="data-table compact stage-table"><caption class="sr-only">CPU timer cost per call and per frame</caption>
+          <thead><tr><th scope="col">Case</th><th scope="col" class="num">Wind transform setup · µs per call</th><th scope="col" class="num">· µs CPU work per frame</th><th scope="col" class="num">Skinning scene tick · µs per call</th><th scope="col" class="num">· µs CPU work per frame</th></tr></thead><tbody></tbody></table></div>
+        <p class="hint">From a separate, unscored Unreal Insights capture of the same fields. Wind transform setup (FDynamicWindTransformProvider::ProvideTransforms) prepares the GPU wind work and runs on worker threads; CPU work per frame sums its time across threads and is not added to frame time. The skinning scene tick is broader renderer bookkeeping and includes non-wind work.</p>
+      </details>
+    </section>
+
+    <section id="method" class="band" aria-labelledby="method-title">
+      <div class="section-heading">
+        <h2 id="method-title">Method</h2>
+      </div>
+      <div class="method-grid">
+        <article><h3>Inputs</h3><ul>
+          <li>Every cut starts from the same imported LOD0, on an isolated copy. Where a plugin couldn't represent the source material, no cut was forced and the result is marked Incompatible.</li>
+                    <li id="method-mmn"></li>
+        </ul></article>
+        <article><h3>Outline scores</h3><ul>
+          <li>2048 × 2048 subject-only captures, 40° field of view, wind and world-position offset off, bind pose.</li>
+          <li>Wildflowers: front at near, mid and far distances, plus side and oblique near. Trees: front, side and oblique near. Other plants: front near. Each plant uses the same cameras for every plugin.</li>
+          <li>A pixel counts as covered when opacity is at least 50%.</li>
+          <li>Outline only. Colour, shading, normals and hidden interior leaves are not scored.</li>
+        </ul></article>
+        <article><h3>GPU timing</h3><ul id="method-gpu"></ul></article>
+        <article><h3>Not tested</h3><ul>
+          <li>Deformation quality under wind.</li>
+          <li>Distance LOD transitions and packaged builds.</li>
+        </ul></article>
+      </div>
+    </section>
+    <div id="load-error" class="load-error" role="alert" hidden></div>
+  </main>
+  <dialog id="image-lightbox" class="image-lightbox" aria-label="Image viewer">
+    <div class="lightbox-shell">
+      <header class="lightbox-header">
+        <div><span id="lightbox-section" class="lightbox-section"></span><h2 id="lightbox-title"></h2></div>
+        <div class="lightbox-actions"><button id="lightbox-compare" type="button" aria-pressed="false">Compare</button><button id="lightbox-close" type="button" aria-label="Close image viewer">Close</button></div>
+      </header>
+      <div id="lightbox-content" class="lightbox-content"></div>
+      <footer class="lightbox-footer"><button id="lightbox-prev" type="button">← Previous</button><span id="lightbox-counter"></span><button id="lightbox-next" type="button">Next →</button></footer>
+      <div id="lightbox-picks" class="lightbox-picks" role="group" aria-label="Images in this section"></div>
+    </div>
+  </dialog>
+  <footer><span>Nanite foliage comparison · UE 5.8.4</span><a href="#top">Back to top ↑</a></footer>
+</body>
+</html>
