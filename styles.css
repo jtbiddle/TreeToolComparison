@@ -447,6 +447,7 @@ body.lightbox-open { overflow: hidden; }
 .intro.maskednanite, .limit.maskednanite { border-top-color: var(--maskednanite); }
 .intro h2, .limit h3 { font-size: 1.1rem; margin: 0 0 .2rem; }
 .intro .price { color: var(--text); font-weight: 600; margin: 0 0 .5rem; font-size: .92rem; }
+.intro .plugin-links { display: flex; flex-wrap: wrap; gap: .35rem .9rem; margin-top: .75rem; }
 .intro p, .limit li { color: var(--text-2); font-size: .92rem; margin: .4rem 0; }
 .intro .fit strong { color: var(--text); }
 .limit ul { margin: .4rem 0 0; padding-left: 1.1rem; }

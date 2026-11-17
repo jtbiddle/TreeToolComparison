@@ -37,17 +37,24 @@
       <div class="plugin-intros">
         <article class="intro leafcut">
           <h2><span class="swatch leafcut"></span>LeafCut</h2>
+          <p class="price">$24.99</p>
           <p>Bakes opacity from each material and cuts automatically. Trees become skeletal Nanite assemblies.</p>
+          <p class="plugin-links"><a href="https://www.fab.com/listings/e463e374-522f-42d8-bae0-7f274993a59f" target="_blank" rel="noreferrer">Fab listing</a></p>
         </article>
         <article class="intro toolkit">
           <h2><span class="swatch toolkit"></span>Foliage Toolkit Plus</h2>
+          <p class="price">$24.99 · Lite free</p>
           <p>Cut preview, hand-editable outlines and saved tree recipes. Small plants use the Lite cutter. Windows only.</p>
+          <p class="plugin-links"><a href="https://www.fab.com/listings/a1dcf406-75b5-4119-96ba-6c14984a23c3" target="_blank" rel="noreferrer">Fab listing</a><a href="https://www.fab.com/listings/2107cdea-d0a3-40c6-933f-b816806b0246" target="_blank" rel="noreferrer">Free Lite</a><a href="https://foliage-plugin.com/docs/" target="_blank" rel="noreferrer">Documentation</a></p>
         </article>
         <article class="intro maskednanite">
           <h2><span class="swatch maskednanite"></span>Masked Material to Nanite</h2>
+          <p class="price">$9.99</p>
           <p>Cuts static meshes from a mask texture and threshold assigned per material. Callable from Blueprint and Python.</p>
+          <p class="plugin-links"><a href="https://www.fab.com/listings/f59fbd35-f5da-4435-9a0b-af464d10a49c" target="_blank" rel="noreferrer">Fab listing</a><a href="https://github.com/krojew/MaskedMaterialToNanite#readme" target="_blank" rel="noreferrer">Documentation &amp; source</a></p>
         </article>
       </div>
+      <p class="hint plugin-price-note">Recorded Fab prices in USD, excluding tax · November 2026.</p>
       <p class="correction">Masked Material to Nanite needs a mask texture and threshold for each material, and Foliage Toolkit's threshold on the two grasses was set the same way; where a material squares or scales alpha before clipping, the threshold is the equivalent texture value. The only quality setting changed from default was Foliage Toolkit's Simplify on the ivy (2 instead of 8). No settings sweep was run, so triangle counts and outline scores describe these settings, not each plugin's best result.</p>
     </section>
 
@@ -107,18 +114,16 @@
       <p><span class="swatch leafcut"></span><strong>LeafCut</strong> produced opaque output for all seven meshes, trees included, without per-material setup. It has no preview, no per-material settings and no Blueprint or Python API.<span id="verdict-leafcut-gpu"></span></p>
       <p><span class="swatch toolkit"></span><strong>Foliage Toolkit</strong> has the most controls. Its tree output kept masked leaf materials on all three trees, and the bush output kept a masked bark card. The small-plant cutter is also available free as Lite.</p>
       <p><span class="swatch maskednanite"></span><strong>Masked Material to Nanite</strong> cut closely on the four small meshes at the highest triangle counts. It outputs static meshes only and needs a mask texture and threshold assigned per material; a fixed texture threshold cannot represent the view-angle fade on the oak and maple leaves.</p>
-      <h3>Prices and requirements</h3>
-      <div class="table-scroll"><table class="matrix specs"><caption class="sr-only">Prices and requirements</caption>
+      <h3>Requirements</h3>
+      <div class="table-scroll"><table class="matrix specs"><caption class="sr-only">Plugin requirements</caption>
         <thead><tr><th></th><th scope="col"><span class="swatch leafcut"></span>LeafCut</th><th scope="col"><span class="swatch toolkit"></span>Foliage Toolkit</th><th scope="col"><span class="swatch maskednanite"></span>Masked Material to Nanite</th></tr></thead>
         <tbody>
-          <tr><th scope="row">Price</th><td>$24.99</td><td>$24.99 (Plus)<small>Lite cutter free; small plants only</small></td><td>$9.99<small>Source also public on GitHub</small></td></tr>
           <tr><th scope="row">Engine</th><td>Tested on 5.8<small>Nanite assemblies need 5.7+</small></td><td>Plus 5.7–5.8, Lite 5.1–5.8<small>Plus needs the Experimental Procedural Vegetation Editor plugin</small></td><td>Tested on 5.8<small>Needed a project-local fix for a single-material array crash in UE 5.8</small></td></tr>
           <tr><th scope="row">Platforms</th><td>Win64, Linux, Mac</td><td>Win64 only</td><td>Win64, Linux, Mac</td></tr>
           <tr><th scope="row">Tree output</th><td>Skeletal Nanite assembly with wind data</td><td>Skeletal Nanite assembly, tunable wind, runtime wind actor</td><td>Static mesh</td></tr>
           <tr><th scope="row">Blueprint / Python</th><td>No<small>C++ functions only</small></td><td>Yes</td><td>Yes</td></tr>
         </tbody>
       </table></div>
-      <p class="hint">Prices are from the Fab listings in November 2026, excluding tax: <a href="https://www.fab.com/listings/e463e374-522f-42d8-bae0-7f274993a59f" target="_blank" rel="noreferrer">LeafCut</a>, <a href="https://www.fab.com/listings/a1dcf406-75b5-4119-96ba-6c14984a23c3" target="_blank" rel="noreferrer">Foliage Toolkit Plus</a>, <a href="https://www.fab.com/listings/2107cdea-d0a3-40c6-933f-b816806b0246" target="_blank" rel="noreferrer">Lite</a>, <a href="https://www.fab.com/listings/f59fbd35-f5da-4435-9a0b-af464d10a49c" target="_blank" rel="noreferrer">Masked Material to Nanite</a> (<a href="https://github.com/krojew/MaskedMaterialToNanite" target="_blank" rel="noreferrer">GitHub</a>).</p>
     </section>
 
     <div class="part-divider" id="details">
